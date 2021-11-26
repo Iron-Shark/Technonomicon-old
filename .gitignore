@@ -1,4 +1,4 @@
 /guix/current
-/emacs/auto-save-list
-/emacs/eln-cache
-/emacs/elpa
+/emacs.d/auto-save-list
+/emacs.d/eln-cache
+/emacs.d/elpa
