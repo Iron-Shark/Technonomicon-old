@@ -1,6 +1,6 @@
 ;; Basic UI Configuration ------------------------------------------------------
 ;; You will most likely need to adjust this font size for your system!
-(defvar runemacs/default-font-size 180)
+(defvar runemacs/default-font-size 150)
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
@@ -18,9 +18,9 @@
 ;; Font Configuration ----------------------------------------------------------
 (set-face-attribute 'default nil :font "Overpass" :height runemacs/default-font-size)
 ;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Overpass" :height 260)
+(set-face-attribute 'fixed-pitch nil :font "Overpass" :height 160)
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 295 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 195 :weight 'regular)
 ;; Package Manager Configuration -----------------------------------------------
 ;; Initialize package sources
 (require 'package)
