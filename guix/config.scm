@@ -22,7 +22,8 @@
                 %base-user-accounts))
   (packages
     (append
-      (list (specification->package "nss-certs"))
+      (list
+	(specification->package "nss-certs"))
       %base-packages))
   (services
     (append

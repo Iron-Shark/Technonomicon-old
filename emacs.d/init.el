@@ -1,17 +1,16 @@
 ;; Basic UI Configuration ------------------------------------------------------
 ;; You will most likely need to adjust this font size for your system!
-(defvar runemacs/default-font-size 150)
+(defvar runemacs/default-font-size 130)
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
 (tooltip-mode -1)           ; Disable tooltips
-(set-fringe-mode 10)        ; Give some breathing room
+(set-fringe-mode 5)        ; Give some breathing room
 (menu-bar-mode -1)            ; Disable the menu bar
 ;; Set up the visible bell
 (setq visible-bell t)
 ;; Disable line numbers for some modes
-(dolist (mode '(org-mode-hook
-                term-mode-hook
+(dolist (mode '(term-mode-hook
                 shell-mode-hook
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
