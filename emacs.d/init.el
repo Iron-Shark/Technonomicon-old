@@ -24,8 +24,11 @@
 ;; Set Calendar to monospace font
 (defun set-buffer-to-courier ()
   (face-remap-add-relative 'default '(:family "Overpass Mono" :height 120)))
-
 (add-hook 'calendar-mode-hook 'set-buffer-to-courier)
+;; Set Location Data
+(setq calendar-latitude 42.3314)
+(setq calendar-longitude -83.0458)
+(setq calendar-location-name "Detroit,MI")
 ;; Package Manager Configuration -----------------------------------------------
 ;; Initialize package sources
 (require 'package)
