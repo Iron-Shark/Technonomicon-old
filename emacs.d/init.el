@@ -1,6 +1,6 @@
 ;; Basic UI Configuration ------------------------------------------------------
 ;; You will most likely need to adjust this font size for your system!
-(defvar runemacs/default-font-size 130)
+(defvar runemacs/default-font-size 125)
 (setq inhibit-startup-message t)
 (scroll-bar-mode -1)        ; Disable visible scrollbar
 (tool-bar-mode -1)          ; Disable the toolbar
@@ -20,7 +20,12 @@
 ;; Set the fixed pitch face
 (set-face-attribute 'fixed-pitch nil :font "Overpass" :height 160)
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Cantarell" :height 195 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Overpass" :height 195 :weight 'regular)
+;; Set Calendar to monospace font
+(defun set-buffer-to-courier ()
+  (face-remap-add-relative 'default '(:family "Overpass Mono" :height 120)))
+
+(add-hook 'calendar-mode-hook 'set-buffer-to-courier)
 ;; Package Manager Configuration -----------------------------------------------
 ;; Initialize package sources
 (require 'package)
@@ -66,7 +71,7 @@
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 (use-package doom-themes
-  :init (load-theme 'doom-dracula t))
+  :init (load-theme 'doom-vibrant t))
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 (use-package which-key
