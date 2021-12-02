@@ -16,11 +16,11 @@
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 ;; Font Configuration ----------------------------------------------------------
-(set-face-attribute 'default nil :font "Overpass" :height runemacs/default-font-size)
+(set-face-attribute 'default nil :font "Overpass Mono" :height runemacs/default-font-size)
 ;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "Overpass" :height 160)
+(set-face-attribute 'fixed-pitch nil :font "Overpass Mono" :height 160)
 ;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Overpass" :height 195 :weight 'regular)
+(set-face-attribute 'variable-pitch nil :font "Overpass Mono" :height 195 :weight 'regular)
 ;; Set Calendar to monospace font
 (defun set-buffer-to-courier ()
   (face-remap-add-relative 'default '(:family "Overpass Mono" :height 120)))
@@ -103,6 +103,10 @@
   ([remap describe-variable] . counsel-describe-variable)
   ([remap describe-key] . helpful-key))
 ;; Key Binding Configuration ---------------------------------------------------
+;; Org Mode Global Keys
+(global-set-key (kbd "C-c l") #'org-store-link)
+(global-set-key (kbd "C-c a") #'org-agenda)
+(global-set-key (kbd "C-c c") #'org-capture)
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (use-package general
