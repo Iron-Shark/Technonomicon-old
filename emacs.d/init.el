@@ -46,6 +46,8 @@
 (column-number-mode)
 (global-display-line-numbers-mode t)
 (use-package command-log-mode)
+;;Start Emacs Server
+(server-start)
 ;; Ivy Configuration -----------------------------------------------------------
 (use-package ivy
   :diminish
@@ -74,7 +76,7 @@
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
 (use-package doom-themes
-  :init (load-theme 'doom-vibrant t))
+  :init (load-theme 'doom-city-lights t))
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
 (use-package which-key
