@@ -327,15 +327,29 @@
   (setq visual-fill-column-width 150
        visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
+(use-package org-roam
+  :ensure t
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+	 ("C-c n f" . org-roam-node-find)
+	 ("C-c n i" . org-roam-node-insert))
+  :config
+  (org-roam-setup)
+  (org-roam-db-autosync-mode))
+(setq org-roam-v2-ack t)
+(setq org-roam-directory
+      (file-truename "~/Archive/Wiki/Nodes"))
+
 (use-package visual-fill-column
   :hook (org-mode . efs/org-mode-visual-fill))
+
+;;Do Not Edit Below this point
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(visual-fill-column org-bullets forge evil-magit magit counsel-projectile projectile hydra evil-collection evil helpful counsel ivy-rich command-log-mode which-key use-package rainbow-delimiters ivy general doom-themes doom-modeline)))
+   '(polymode org-brain emacs-sqlight3 emacs-sqlight3- sqlite3 emacsql3 emacsql-libsqlite3 emacsql-sqlight3 EmacSQL-SQLight emacsql-sqlight Emacsql EmacSQL-sqlite EmacSQL org-roam visual-fill-column org-bullets forge evil-magit magit counsel-projectile projectile hydra evil-collection evil helpful counsel ivy-rich command-log-mode which-key use-package rainbow-delimiters ivy general doom-themes doom-modeline)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
