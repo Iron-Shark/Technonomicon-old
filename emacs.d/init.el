@@ -1,3 +1,31 @@
+
+;; Install Straight.el--------------------------------------------------------------------
+;; Detirmines if straight.el is present.
+(unless (featurep 'straight)
+
+;; Bootstrap straight.el
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage)))
+
+;; Use straight.el for use-package expressions
+(straight-use-package 'use-package)
+
+;; Initialize use-package
+(unless (package-installed-p 'use-package)
+   (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
+
 ;; Basic UI Configuration ------------------------------------------------------
 ;; You will most likely need to adjust this font size for your system!
 (defvar runemacs/default-font-size 125)
@@ -29,20 +57,6 @@
 (setq calendar-latitude 42.3314)
 (setq calendar-longitude -83.0458)
 (setq calendar-location-name "Detroit,MI")
-;; Package Manager Configuration -----------------------------------------------
-;; Initialize package sources
-(require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
-(package-initialize)
-(unless package-archive-contents
- (package-refresh-contents))
-;; Initialize use-package on non-Linux platforms
-(unless (package-installed-p 'use-package)
-   (package-install 'use-package))
-(require 'use-package)
-(setq use-package-always-ensure t)
 (column-number-mode)
 (global-display-line-numbers-mode t)
 (use-package command-log-mode)
@@ -341,6 +355,23 @@
 
 (use-package visual-fill-column
   :hook (org-mode . efs/org-mode-visual-fill))
+
+;; Install Flyspell
+;; Spell checking
+;; Requires Hunspell
+(use-package flyspell
+  :config
+  (setq ispell-program-name "hunspell"
+        ispell-default-dictionary "en_US")
+  :hook (text-mode . flyspell-mode)
+  :bind (("M-<f7>" . flyspell-buffer)
+         ("<f7>" . flyspell-word)
+         ("C-;" . flyspell-auto-correct-previous-word)))
+
+;; BibLaTeX settings
+;; bibtex-mode
+(setq bibtex-dialect 'biblatex)
+
 
 ;;Do Not Edit Below this point
 (custom-set-variables
