@@ -20,6 +20,9 @@
                 shell-mode-hook
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+;; Start Emacs in fullscreen mode
+(custom-set-variables
+ '(initial-frame-alist (quote ((fullscreen . maximized)))))
 
 ;; Font Configuration --------------------------------------------------------------------
 (set-face-attribute 'default nil :font "JetBrains Mono"
