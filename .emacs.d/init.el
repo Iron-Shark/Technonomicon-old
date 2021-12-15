@@ -1,7 +1,5 @@
 ;; Disable package.el
 (setq package-enable-at-startup nil)
-;; Temporary Theme------------------------------------------------------------------------
-(load-theme 'wombat)
 
 ;; Basic UI Configuration ----------------------------------------------------------------
 ;; You will most likely need to adjust this font size for your system!
@@ -12,30 +10,24 @@
 (tooltip-mode -1)           	; Disable tooltips
 (set-fringe-mode 5)        	; Give some breathing room
 (menu-bar-mode -1)            	; Disable the menu bar
+
+(column-number-mode)
+(global-display-line-numbers-mode t)
+(global-visual-line-mode t)
+
 ;; Set up the visible bell
 (setq visible-bell t)
+
 ;; Disable line numbers for some modes
 (dolist (mode '(org-mode-hook
 		term-mode-hook
                 shell-mode-hook
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
 ;; Start Emacs in fullscreen mode
 (custom-set-variables
  '(initial-frame-alist (quote ((fullscreen . maximized)))))
-
-;; Font Configuration --------------------------------------------------------------------
-(set-face-attribute 'default nil :font "JetBrains Mono"
-                       		 :weight 'semibold
-				 :height 160)
-;; Set the fixed pitch face
-(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" 
-		    		     :weight 'semibold 
-				     :height 160)
-;; Set the variable pitch face
-(set-face-attribute 'variable-pitch nil :font "Overpass" 
-					:weight 'regular)
-		    			:height 160 
 
 ;; Set Location Data----------------------------------------------------------------------
 (setq calendar-latitude 42.33)
@@ -80,55 +72,91 @@
 ;; System Dependencies------------------------------------------------------------------
 ;; Async
 (use-package async
-	     :straight (:host github 
-			:repo "jwiegley/emacs-async"
-			:branch "master"))
+  :straight (:host github 
+		   :repo "jwiegley/emacs-async"
+		   :branch "master"))
 ;; Popup
 (use-package popup
-	     :straight (:host github 
-			:repo "auto-complete/popup-el"
-			:branch "master"))
+  :straight (:host github 
+		   :repo "auto-complete/popup-el"
+		   :branch "master"))
 ;; Emojify 
 (use-package emojify
-	     :straight (:host github 
-			:repo "iqbalansari/emacs-emojify"
-			:branch "master"))
+  :straight (:host github 
+		   :repo "iqbalansari/emacs-emojify"
+		   :branch "master"))
 ;; Undo Tree
 (use-package undo-tree
-	     :straight (:host github 
-			:repo "emacs-straight/undo-tree"
-			:branch "master"))
+  :straight (:host github 
+		   :repo "emacs-straight/undo-tree"
+		   :branch "master"))
 
 ;; Which-key
-(use-package which-key 
-	     :straight (:host github
-			:repo "justbur/emacs-which-key" 
-			:branch "master")
-	     	        :defer 0
-  			:diminish which-key-mode
-  			:config
-  			(which-key-mode)
-  			(setq which-key-idle-delay 1))
+(use-package which-key
+  :straight (:host github
+		   :repo "justbur/emacs-which-key" 
+		   :branch "master")
+	     	   :defer 0
+  		   :diminish which-key-mode
+  		   :config
+  		   (which-key-mode)
+  		   (setq which-key-idle-delay 1))
 
 ;; Helpful
 (use-package helpful 
-	     :straight (:host github 
-		        :repo "Wilfred/helpful"
-		        :branch "master")
-               	        :commands (helpful-callable helpful-variable helpful-command helpful-key)
-                        :custom
-                        (counsel-describe-function-function #'helpful-callable)
-                        (counsel-describe-variable-function #'helpful-variable)
-                        :bind
-                        ([remap describe-command] . helpful-command)
-                        ([remap describe-key] . helpful-key))
+  :straight (:host github 
+		   :repo "Wilfred/helpful"
+		   :branch "master")
+               	   :commands (helpful-callable helpful-variable helpful-command helpful-key)
+                   :custom
+                   (counsel-describe-function-function #'helpful-callable)
+                   (counsel-describe-variable-function #'helpful-variable)
+                   :bind
+                   ([remap describe-command] . helpful-command)
+                   ([remap describe-key] . helpful-key))
+
+;; Icons
+(use-package all-the-icons
+  :straight (:host github
+		   :repo "domtronn/all-the-icons.el"
+		   :branch "master"))
+;; After downloading run "M-x all-the-icons-install-fonts" on first start up.
+
+;; Visual Changes-----------------------------------------------------------------------
+;; Font Configuration
+(set-face-attribute 'default nil :font "JetBrains Mono"
+                       		 :weight 'semibold
+				 :height 160)
+;; Set the fixed pitch face
+(set-face-attribute 'fixed-pitch nil :font "JetBrains Mono" 
+		    		     :weight 'semibold 
+				     :height 160)
+;; Set the variable pitch face
+(set-face-attribute 'variable-pitch nil :font "Overpass" 
+					:weight 'regular)
+		    			:height 160 
+
+;; Doom Themes
+(use-package doom-themes
+  :straight (:host github
+		   :repo "hlissner/emacs-doom-themes"
+		   :branch "master")
+  :init (load-theme 'doom-city-lights t))
+		   
+;; Doom Modline
+(use-package doom-modeline
+  :straight (:host github
+		   :reop "seagle0128/doom-modeline"
+		   :branch "master")
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 
 ;; Helm----------------------------------------------------------------------------------
 (use-package helm 
-	     :straight (:host github 
-			:repo "emacs-helm/helm"
-			:branch "master"))
-	     ;:bind
+  :straight (:host github
+		  :repo "emacs-helm/helm"
+		  :branch "master"))
+	         ;:bind
 
 ;; Set Global Helm Keys
 (global-set-key (kbd "M-x") #'helm-M-x)
@@ -171,44 +199,48 @@
 
 (helm-mode 1)
 
-;; VI ------------------------------------------------------------------------------------
+;; Keyboard ------------------------------------------------------------------------------------
+;; Assign ESC to quite prompts
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
 ;; Evil
 (use-package evil
-	     :straight (:host github 
-			:repo "emacs-evil/evil"
-			:branch "master")
-	     :init
-	     (setq evil-want-integration t)
-	     (setq evil-want-keybinding nil)
-	     (setq evil-want-C-u-scroll t)
-	     (setq evil-want-C-i-jump nil)
-	     (setq evil-respect-visual-line-mode t)
-	     (setq evil-undo-system 'undo-tree)
-	     :config
-	     (evil-mode 1)
-	     (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-	     (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
+  :straight (:host github 
+		   :repo "emacs-evil/evil"
+		   :branch "master")
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-i-jump nil)
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-undo-system 'undo-tree)
+  :config
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
 
 ;; Evil Collection
 (use-package evil-collection
-	     :straight (:host github 
-			:repo "emacs-evil/evil-collection"
-			:branch "master"))
+  :straight (:host github 
+		   :repo "emacs-evil/evil-collection"
+		   :branch "master"))
 
-;; General Keybindings
+;; General
 (use-package general
-	     :straight (:host github 
-			:repo "noctuid/general.el"
-			:branch "master")
-	     :after evil
-             :config
-             (general-create-definer efs/leader-keys
-               :keymaps '(normal insert visual emacs)
-               :prefix "SPC"
-               :global-prefix "C-SPC")
+  :straight (:host github 
+		   :repo "noctuid/general.el"
+		   :branch "master")
+  :after evil
+  :config
+  (general-create-definer efs/leader-keys
+  :keymaps '(normal insert visual emacs)
+  :prefix "SPC"
+  :global-prefix "C-SPC")
 
-             (efs/leader-keys
-               "t"  '(:ignore t :which-key "toggles")))
+  (efs/leader-keys
+   "t"  '(:ignore t :which-key "toggles")))
 
 ;; Set Emacs state modes
 (dolist (mode '(custom-mode
@@ -235,13 +267,13 @@
 ;; Org Submodes---------------------------------------------------------------------------
 ;; Org
 (use-package org
-	     :straight (:host github 
-			:repo "bzg/org-mode"
-			:branch "main")
-  			:commands (org-capture org-agenda)
-;  			:hook (org-mode . efs/org-mode-setup)
-  			:config
-  			(setq org-ellipsis " ▾"))
+  :straight (:host github 
+		   :repo "bzg/org-mode"
+		   :branch "main")
+  :commands (org-capture org-agenda)
+; :hook (org-mode . efs/org-mode-setup)
+  :config
+   (setq org-ellipsis " ▾"))
 
 ;; Org Roam
 (use-package org-roam
