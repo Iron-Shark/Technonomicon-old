@@ -1,6 +1,9 @@
 ;; This is an operating system configuration generated
 ;; by the graphical installer.
 
+;;https://guix.gnu.org/manual/en/guix.html#index-Nix 
+;; Steps for adding the nix package manager (maybe?)
+
 (use-modules (gnu)
 	     (nongnu packages linux)
 	     (nongnu system linux-initrd))

@@ -3,6 +3,7 @@
 	"vim"			;Vim text editor
 	"git"			;Git version control
 	"firefox"		;Firefox nightly, locally compiled
+	;"nix"			;Nix packagemanager
 	"font-overpass" 	;Overpass font theme - https://overpassfont.org/
 	"font-jetbrains-mono" 	;JetBrains font theme - https://www.jetbrains.com/
 	"fontconfig"		;After installing this and target fonts run "$fc-cache -rv"
