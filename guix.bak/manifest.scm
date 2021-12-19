@@ -14,9 +14,8 @@
 	"clang"         	;C/C++ compiler front end.
 	"stow"			;Symlink manager
 	"curl"			;Terminal URL download tool
-	"autobuild"		;Autobuild utility for pdf-tools
-	"r-pdftools"		;PDF tools backend for emacs package
 	))
 
 ;;after updating run "guix package --manifest=.dotfiles/guix/manifest.scm"
 ;
+;; Nix PKM installed using bash <(curl -L https://nixos.org/nix/install) --no-deamon
