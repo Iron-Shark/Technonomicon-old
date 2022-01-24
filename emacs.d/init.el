@@ -282,3 +282,49 @@
 (use-package latex-preview-pane)
 
 ;; PDF
+(use-package pdf-tools
+  :defer t
+  :pin manual
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  :bind (:map pdf-view-mode-map
+	      ("s" . pdf-occur)
+	      ("g" . pdf-view-first-page)
+	      ("G" . pdf-view-last-page)
+	      ("j" . pdf-view-next-page) 
+	      ("k" . pdf-view-previous-page)
+	      ("e" . pdf-view-goto-page)
+	      ("u" . pdf-view-revert-buffer)
+	      ("y" . pdf-view-kill-ring-save)
+	      ("i" . pdf-misc-display-metadata)
+	      ("b" . pdf-view-set-slice-from-bounding-box)
+	      ("r" . pdf-view-reset-slice)
+	      ("l" . image-forward-scroll)
+	      ("h" . image-backward-scroll)
+	      ("al" . pdf-annot-list-annontations)
+	      ("ad" . pdf-annot-delete)
+	      ("aa" . pdf-annot-attachment-dired)
+	      ("am" . pdf-annot-add-markup-annotation)
+	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
+  :custom
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+
+(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+      TeX-source-correlate-start-server t)
+
+(add-hook 'TeX-after-compilation-finished-functions
+	  #'TeX-revert-document-buffer)
+
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+
+(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+
+(use-package org-pdfview
+  :config
+  (add-to-list 'org-file-apps
+	       '("\\.pdf\\'" . (lambda (file link)
+				 (org-pdfview-open link)))))
