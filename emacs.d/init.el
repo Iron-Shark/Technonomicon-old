@@ -250,7 +250,7 @@
   (org-babel-do-load-languages
     'org-babel-load-languages
     '((emacs-lisp . t)
-      (ledger . t)
+      ;; (ledger . t)
       (lisp . t)
       (latex . t)
       (scheme . t)))
@@ -281,14 +281,12 @@
 
 (use-package latex-preview-pane)
 
-;; PDF
 (use-package pdf-tools
   :defer t
   :pin manual
   :config
   (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width)
-  (define-key pdf-view-display-size 'fit-width)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
   :bind (:map pdf-view-mode-map
 	      ("s" . pdf-occur)
@@ -299,18 +297,15 @@
 	      ("e" . pdf-view-goto-page)
 	      ("u" . pdf-view-revert-buffer)
 	      ("y" . pdf-view-kill-ring-save)
-	      ("i" . pdf-misc-display-metadata)
+	      ("m" . pdf-misc-display-metadata)
 	      ("b" . pdf-view-set-slice-from-bounding-box)
 	      ("r" . pdf-view-reset-slice)
-	      ("l" . image-forward-scroll)
-	      ("h" . image-backward-scroll)
-	      ("al" . pdf-annot-list-annontations)
 	      ("ad" . pdf-annot-delete)
 	      ("aa" . pdf-annot-attachment-dired)
-	      ("am" . pdf-annot-add-markup-annotation)
 	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
   :custom
-  (pdf-annot-activate-created-annotations t "automatically annotate highlights"))
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights")
+  (pdf-view-active-region nil))
 
 (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
       TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
@@ -328,38 +323,3 @@
   (add-to-list 'org-file-apps
 	       '("\\.pdf\\'" . (lambda (file link)
 				 (org-pdfview-open link)))))
-
-;; PDF to Org-Mode Tools
-(use-package org-noter)
-
-(use-package org-pdftools
-  :hook (org-mode . org-pdftools-setup-link))
-
-(use-package org-noter-pdftools
-  :after org-noter
-  :config
-  (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((org-noter-insert-note-no-questions (if toggle-no-questions
-						   (not org-noter-insert-note-no-questions)
-						 org-noter-insert-note-no-questions))
-	   (org-pdftools-use-isearch-link t)
-	   (org-pdftools-use-freestyle-annot t))
-       (org-noter-insert-note (org-noter--get-precise-info)))))
-  (defun org-noter-set-start-location (&optional arg)
-    "When opening a session with this document, go to the current location. With a prefix ARG, remove start location."
-    (interactive "P")
-    (org-noter--with-valid-session
-     (let ((inhibit-read-only t)
-	   (ast (org-noter--parse-root))
-	   (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
-       (with-current-buffer (org-noter--session-notes-buffer session)
-	 (org-with-wide-buffer)
-	 (goto-char (org-element-property :begin ast))
-	 (if arg
-	     (org-entry-delete nil org-noter-property-note-location)
-	   (org-entry-put nil org-noter-property-note-location
-			  (org-noter--pretty-print-location location)))))))
-  (with-eval-after-load 'pdf-annot
-    (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
