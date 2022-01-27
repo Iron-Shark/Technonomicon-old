@@ -323,3 +323,6 @@
   (add-to-list 'org-file-apps
 	       '("\\.pdf\\'" . (lambda (file link)
 				 (org-pdfview-open link)))))
+
+(use-package hydra)
+;; Configure this more as workflows develope
