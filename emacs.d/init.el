@@ -175,6 +175,9 @@
 (evil-set-initial-state 'messages-buffer-mode 'normal)
 (evil-set-initial-state 'dashboard-mode 'normal)
 
+(use-package hydra)
+;; Configure this more as workflows develope
+
 ;; Fly-X----------------------------------------------------------------------------------
 ;; FlySpell
 (dolist (hook '(text-mode-hook))
@@ -324,5 +327,11 @@
 	       '("\\.pdf\\'" . (lambda (file link)
 				 (org-pdfview-open link)))))
 
-(use-package hydra)
-;; Configure this more as workflows develope
+(use-package async)
+
+(use-package dired-async
+  :straight async
+  :diminish (dired-async-mode)
+  :init (setq dire-async-message-function #'message)
+  (with-eval-after-load 'dired (dired-async-mode)))
+(dired-async-mode 1)
