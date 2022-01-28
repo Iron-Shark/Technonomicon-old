@@ -345,3 +345,16 @@
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
+
+(use-package helm-bibtex)
+  ;; (setq bibtex-completion-bibliography
+  ;; 	'("/path/to/bibtex-file-1.bib"))
+
+;; Parens unbalaced while waiting to finalize config.Need to create a
+;; permenate bib file and a directory for similar large semi static non-node
+;; docs.
+
+  ;; (setq bibtex-completion-pdf-field "File")
+  ;; (setq bibtex-completion-library-path '("/path1/to/pdfs" "/path2/to/pdfs"))
+;; Sets to expect zotero file path field, and the path to permenate location of pdf storage.
+;; Only one or the other should be needed.
