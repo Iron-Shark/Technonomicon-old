@@ -1,4 +1,3 @@
-;; Disable package.el
 (setq package-enable-at-startup nil)
 
 ;; Basic UI Configuration ----------------------------------------------------------------
@@ -266,7 +265,6 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-
 (defun runemacs/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
         visual-fill-column-center-text t)
@@ -327,6 +325,21 @@
 	       '("\\.pdf\\'" . (lambda (file link)
 				 (org-pdfview-open link)))))
 
+(use-package org-ref
+  :init
+  (require 'bibtex)
+  (setq bibtex-autokey-year-length 4
+	bibtex-autokey-name-year-separator "-"
+	bibtex-autokey-year-title-separator "-"
+	bibtex-autokey-titleword-separator "-"
+	bibtex-autokey-titlewords 2
+	bibtex-autokey-titlewords-stretch 1
+	bibtex-autokey-titleword-lenght 5)
+  (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
+  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
+  (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body))
+;;  (require 'org-ref-helm)) ; not sure why this is causing errors.
+
 ;; Helm and Dependencies
 (use-package async)
 
@@ -349,12 +362,19 @@
 (use-package helm-bibtex)
   ;; (setq bibtex-completion-bibliography
   ;; 	'("/path/to/bibtex-file-1.bib"))
-
 ;; Parens unbalaced while waiting to finalize config.Need to create a
 ;; permenate bib file and a directory for similar large semi static non-node
 ;; docs.
-
-  ;; (setq bibtex-completion-pdf-field "File")
-  ;; (setq bibtex-completion-library-path '("/path1/to/pdfs" "/path2/to/pdfs"))
+  ;; bibtex-completion-pdf-field "File"
+  ;; bibtex-completion-library-path '("/path1/to/pdfs" "/path2/to/pdfs")
 ;; Sets to expect zotero file path field, and the path to permenate location of pdf storage.
 ;; Only one or the other should be needed.
+  ;; bibtex-completion-additional-search-fields '(keywords))
+
+(use-package org-ref-helm
+  :straight org-ref
+  :init (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
+	      org-ref-insert-cite-function 'org-ref-cite-insert-helm
+	      org-ref-insert-label-function 'org-ref-insert-label-link
+	      org-ref-insert-ref-function 'org-ref-insert-ref-link
+	      org-ref-cite-onclick-funciton (lambda (_) (org-ref-citation-hydra/body))))
