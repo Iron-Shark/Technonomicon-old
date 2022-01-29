@@ -360,6 +360,11 @@
   (org-roam-db-autosync-mode)
   (require 'org-roam-protocol))
 
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (require 'org-ref))
+
 ;; Helm and Dependencies
 (use-package async)
 
