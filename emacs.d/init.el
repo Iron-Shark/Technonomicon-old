@@ -19,6 +19,9 @@
 ;; Set up the visible bell
 (setq visible-bell t)
 
+;; Automattically follow Symlinks
+(setq vc-follow-symlinks t)
+
 ;; Disable line numbers for some modes
 (dolist (mode '(pdf-view-mode-hook
 		term-mode-hook
@@ -341,29 +344,53 @@
 	org-ref-insert-link-function 'org-ref-link-hydra/body
 	org-ref-insert-cite-function 'org-ref-cite-insert-helm
 	org-ref-insert-label-function 'org-ref-insert-label-link
-	org-ref-insert-ref-function 'org-ref-insert-ref-link)
-  (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-  (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-  (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body))
+	org-ref-insert-ref-function 'org-ref-insert-ref-link))
+  ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
+  ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/bod)
 
 (use-package org-roam
+  :init
+  (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory (file-truename "~/Temp-Archive/Nodes"))
+  (org-roam-completion-everywhere t)
+  ;; (org-roam-capture-templates
+  ;;  '(("r" "Reference Core" plain
+  ;;     (file "~/Temp-Archive/Files/Templates/Reference-Core.org")
+  ;; 	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+  ;; 	    :unnarrowed t)
+  ;;    ("d" "Default" plain
+  ;;     "%?"
+  ;; 	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+  ;; 	    :unnarrowed t)))
   :bind (("C-c n l" . org-roam-buffer-toggle)
 	 ("C-c n f" . org-roam-node-find)
 	 ("C-c n g" . org-roam-graph)
 	 ("C-c n i" . org-roam-node-insert)
 	 ("C-c n c" . org-roam-capture)
 	 ("C-c n j" . org-roam-dailies-capture-today))
+	 ;; :map org-mode-map
+	 ;; ("C-c i c" . completion-at-point)
+	 ;; ("C-c i p" . org-insert-link)
   :config
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
-  (require 'org-roam-protocol))
+  ;;(require 'org-roam-protocol)
+  (org-roam-setup))
 
-(use-package org-roam-bibtex
-  :after org-roam
-  :config
-  (require 'org-ref))
+;; Org Insert Link Keys
+;; (define-key bibtex-mode-map (kbd "C-c i c") 'completion-at-point)
+;; (define-key bibtex-mode-map (kbd "C-c i r") 'org-ref-insert-link)
+;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
+
+;; (use-package org-roam-bibtex
+;;   :after org-roam
+;;   :config
+;;   (require 'org-ref))
+
+(use-package org-transclusion
+  :after org)
+(define-key global-map (kbd "<f12>") #'org-transclusion-add)
 
 ;; Helm and Dependencies
 (use-package async)
@@ -385,3 +412,7 @@
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 
 (use-package helm-bibtex)
+
+;; Anki Integration
+(use-package anki-editor)
+
