@@ -22,6 +22,13 @@
 ;; Automattically follow Symlinks
 (setq vc-follow-symlinks t)
 
+;; No prompt for revert buffer, Need to assign it to a key
+(defun revert-buffer-no-confirm ()
+  "Revert buffer without confirmation."
+  (interactive) (revert-buffer t t))
+
+(define-key global-map (kbd "C-c u b") 'revert-buffer-no-confirm)
+
 ;; Disable line numbers for some modes
 (dolist (mode '(pdf-view-mode-hook
 		term-mode-hook
@@ -33,7 +40,7 @@
 (custom-set-variables
  '(initial-frame-alist (quote ((fullscreen . maximized)))))
 ;; Full Screen Frame
-(add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
+;; (add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
 
 ;; Set Location Data----------------------------------------------------------------------
 (setq calendar-latitude 42.33)
@@ -196,8 +203,7 @@
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (setq evil-auto-indent nil)
-  (display-line-numbers-mode 0)
-  (diminish org-indent-mode))
+  (display-line-numbers-mode 0))
 
 
 (defun runemacs/org-font-setup ()
@@ -262,91 +268,95 @@
   
   (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
+;; (define-key org-mode-map (kbd "C-c i c") 'completion-at-point)
+;; (define-key org-mode-map (kbd "C-c i r") 'org-ref-insert-link)
+;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
+;; (define-key org-mode-map (kbd "C-c i t") 'org-transclusion-add)
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-;; (defun runemacs/org-mode-visual-fill ()
-;;   (setq visual-fill-column-width 100
-;;         visual-fill-column-center-text t)
-;;   (visual-fill-column-mode 1))
+(defun runemacs/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+        visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
 
-;; (use-package visual-fill-column
-;;   :hook (org-mode . runemacs/org-mode-visual-fill))
+(use-package visual-fill-column
+  :hook (org-mode . runemacs/org-mode-visual-fill))
 
-;; ;; Latex Mode
-;; (use-package tex
-;;   :straight auctex)
-;; ;; Changes default render engine.
-;; (setq latex-run-command "xelatex")
-;; (setq org-latex-compiler "xelatex")
+;; Latex Mode
+(use-package tex
+  :straight auctex)
+;; Changes default render engine.
+(setq latex-run-command "xelatex")
+(setq org-latex-compiler "xelatex")
 
-;; (use-package latex-preview-pane)
+(use-package latex-preview-pane)
 
-;; (use-package pdf-tools
-;;   :defer t
-;;   :pin manual
-;;   :config
-;;   (pdf-tools-install)
-;;   (setq-default pdf-view-display-size 'fit-width)
-;;   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-;;   :bind (:map pdf-view-mode-map
-;; 	      ("s" . pdf-occur)
-;; 	      ("g" . pdf-view-first-page)
-;; 	      ("G" . pdf-view-last-page)
-;; 	      ("j" . pdf-view-next-page) 
-;; 	      ("k" . pdf-view-previous-page)
-;; 	      ("e" . pdf-view-goto-page)
-;; 	      ("u" . pdf-view-revert-buffer)
-;; 	      ("y" . pdf-view-kill-ring-save)
-;; 	      ("m" . pdf-misc-display-metadata)
-;; 	      ("b" . pdf-view-set-slice-from-bounding-box)
-;; 	      ("r" . pdf-view-reset-slice)
-;; 	      ("ad" . pdf-annot-delete)
-;; 	      ("aa" . pdf-annot-attachment-dired)
-;; 	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
-;;   :custom
-;;   (pdf-annot-activate-created-annotations t "automatically annotate highlights")
-;;   (pdf-view-active-region nil))
+(use-package pdf-tools
+  :defer t
+  :pin manual
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+  :bind (:map pdf-view-mode-map
+	      ("s" . pdf-occur)
+	      ("g" . pdf-view-first-page)
+	      ("G" . pdf-view-last-page)
+	      ("j" . pdf-view-next-page) 
+	      ("k" . pdf-view-previous-page)
+	      ("e" . pdf-view-goto-page)
+	      ("u" . pdf-view-revert-buffer)
+	      ("y" . pdf-view-kill-ring-save)
+	      ("m" . pdf-misc-display-metadata)
+	      ("b" . pdf-view-set-slice-from-bounding-box)
+	      ("r" . pdf-view-reset-slice)
+	      ("ad" . pdf-annot-delete)
+	      ("aa" . pdf-annot-attachment-dired)
+	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
+  :custom
+  (pdf-annot-activate-created-annotations t "automatically annotate highlights")
+  (pdf-view-active-region nil))
 
-;; (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-;;       TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-;;       TeX-source-correlate-start-server t)
+(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+      TeX-source-correlate-start-server t)
 
-;; (add-hook 'TeX-after-compilation-finished-functions
-;; 	  #'TeX-revert-document-buffer)
+(add-hook 'TeX-after-compilation-finished-functions
+	  #'TeX-revert-document-buffer)
 
-;; (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
-;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
 
-;; (use-package org-pdfview
-;;   :config
-;;   (add-to-list 'org-file-apps
-;; 	       '("\\.pdf\\'" . (lambda (file link)
-;; 				 (org-pdfview-open link)))))
+(use-package org-pdfview
+  :config
+  (add-to-list 'org-file-apps
+	       '("\\.pdf\\'" . (lambda (file link)
+				 (org-pdfview-open link)))))
 
-;; (use-package org-ref
-;;   :after helm-bibtex
-;;   :init
-;;   (require 'bibtex)
-;;   (require 'org-ref-helm)
-;;   (setq bibtex-autokey-year-length 4
-;; 	bibtex-autokey-name-year-separator "-"
-;; 	bibtex-autokey-year-title-separator "-"
-;; 	bibtex-autokey-titleword-separator "-"
-;; 	bibtex-autokey-titlewords 2
-;; 	bibtex-autokey-titlewords-stretch 1
-;; 	bibtex-autokey-titleword-lenght 5
-;; 	bibtex-completion-bibliography '("~/Temp-Archive/Files/global.bib")
-;; 	org-ref-insert-link-function 'org-ref-link-hydra/body
-;; 	org-ref-insert-cite-function 'org-ref-cite-insert-helm
-;; 	org-ref-insert-label-function 'org-ref-insert-label-link
-;; 	org-ref-insert-ref-function 'org-ref-insert-ref-link))
-;;   ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-;;   ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/bod)
+(use-package org-ref
+  :after helm-bibtex
+  :init
+  (require 'bibtex)
+  (require 'org-ref-helm)
+  (setq bibtex-autokey-year-length 4
+	bibtex-autokey-name-year-separator "-"
+	bibtex-autokey-year-title-separator "-"
+	bibtex-autokey-titleword-separator "-"
+	bibtex-autokey-titlewords 2
+	bibtex-autokey-titlewords-stretch 1
+	bibtex-autokey-titleword-lenght 5
+	bibtex-completion-bibliography '("~/Temp-Archive/Files/global.bib")
+	org-ref-insert-link-function 'org-ref-link-hydra/body
+	org-ref-insert-cite-function 'org-ref-cite-insert-helm
+	org-ref-insert-label-function 'org-ref-insert-label-link
+	org-ref-insert-ref-function 'org-ref-insert-ref-link))
+  ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
+  ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/bod)
 
 (use-package org-roam
   :init
@@ -373,24 +383,25 @@
 	 ;; ("C-c i c" . completion-at-point)
 	 ;; ("C-c i p" . org-insert-link)
   :config
-  ;; (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
-  ;;(require 'org-roam-protocol)
+  (require 'org-roam-protocol)
   (org-roam-setup))
 
-;; Org Insert Link Keys
-;; (define-key bibtex-mode-map (kbd "C-c i c") 'completion-at-point)
-;; (define-key bibtex-mode-map (kbd "C-c i r") 'org-ref-insert-link)
-;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
+  (setq org-roam-dailies-directory "Journal")
 
-;; (use-package org-roam-bibtex
-;;   :after org-roam
-;;   :config
-;;   (require 'org-ref))
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (require 'org-ref))
 
-;; (use-package org-transclusion
-;;   :after org)
-;; (define-key global-map (kbd "<f12>") #'org-transclusion-add)
+(use-package org-transclusion
+  :after org)
+(define-key global-map (kbd "<f12>") #'org-transclusion-add)
+
+(use-package ox-haunt)
+(with-eval-after-load 'ox
+  (require 'ox-haunt))
 
 ;; Helm and Dependencies
 (use-package async)
@@ -411,8 +422,8 @@
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 
-(use-package helm-bibtex)
+;; (use-package helm-bibtex)
 
-;; Anki Integration
+;; ;; Anki Integration
 (use-package anki-editor)
 
