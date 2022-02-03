@@ -182,10 +182,10 @@
 
 ;; Fly-X----------------------------------------------------------------------------------
 ;; FlySpell
-(dolist (hook '(text-mode-hook))
-  (add-hook hook (lambda ()
-	(setq ispell-program-name "~/.guix-profile/bin/hunspell")
-	(flyspell-mode 1))))
+;; (dolist (hook '(text-mode-hook))
+;;   (add-hook hook (lambda ()
+;; 	(setq ispell-program-name "~/.guix-profile/bin/hunspell")
+;; 	(flyspell-mode 1))))
 ;;TODO Install Flycheck
 
 ;; Org------------------------------------------------------------------------------------
@@ -268,91 +268,91 @@
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
-(defun runemacs/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-        visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
+;; (defun runemacs/org-mode-visual-fill ()
+;;   (setq visual-fill-column-width 100
+;;         visual-fill-column-center-text t)
+;;   (visual-fill-column-mode 1))
 
-(use-package visual-fill-column
-  :hook (org-mode . runemacs/org-mode-visual-fill))
+;; (use-package visual-fill-column
+;;   :hook (org-mode . runemacs/org-mode-visual-fill))
 
-;; Latex Mode
-(use-package tex
-  :straight auctex)
-;; Changes default render engine.
-(setq latex-run-command "xelatex")
-(setq org-latex-compiler "xelatex")
+;; ;; Latex Mode
+;; (use-package tex
+;;   :straight auctex)
+;; ;; Changes default render engine.
+;; (setq latex-run-command "xelatex")
+;; (setq org-latex-compiler "xelatex")
 
-(use-package latex-preview-pane)
+;; (use-package latex-preview-pane)
 
-(use-package pdf-tools
-  :defer t
-  :pin manual
-  :config
-  (pdf-tools-install)
-  (setq-default pdf-view-display-size 'fit-width)
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
-  :bind (:map pdf-view-mode-map
-	      ("s" . pdf-occur)
-	      ("g" . pdf-view-first-page)
-	      ("G" . pdf-view-last-page)
-	      ("j" . pdf-view-next-page) 
-	      ("k" . pdf-view-previous-page)
-	      ("e" . pdf-view-goto-page)
-	      ("u" . pdf-view-revert-buffer)
-	      ("y" . pdf-view-kill-ring-save)
-	      ("m" . pdf-misc-display-metadata)
-	      ("b" . pdf-view-set-slice-from-bounding-box)
-	      ("r" . pdf-view-reset-slice)
-	      ("ad" . pdf-annot-delete)
-	      ("aa" . pdf-annot-attachment-dired)
-	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
-  :custom
-  (pdf-annot-activate-created-annotations t "automatically annotate highlights")
-  (pdf-view-active-region nil))
+;; (use-package pdf-tools
+;;   :defer t
+;;   :pin manual
+;;   :config
+;;   (pdf-tools-install)
+;;   (setq-default pdf-view-display-size 'fit-width)
+;;   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+;;   :bind (:map pdf-view-mode-map
+;; 	      ("s" . pdf-occur)
+;; 	      ("g" . pdf-view-first-page)
+;; 	      ("G" . pdf-view-last-page)
+;; 	      ("j" . pdf-view-next-page) 
+;; 	      ("k" . pdf-view-previous-page)
+;; 	      ("e" . pdf-view-goto-page)
+;; 	      ("u" . pdf-view-revert-buffer)
+;; 	      ("y" . pdf-view-kill-ring-save)
+;; 	      ("m" . pdf-misc-display-metadata)
+;; 	      ("b" . pdf-view-set-slice-from-bounding-box)
+;; 	      ("r" . pdf-view-reset-slice)
+;; 	      ("ad" . pdf-annot-delete)
+;; 	      ("aa" . pdf-annot-attachment-dired)
+;; 	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
+;;   :custom
+;;   (pdf-annot-activate-created-annotations t "automatically annotate highlights")
+;;   (pdf-view-active-region nil))
 
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-      TeX-source-correlate-start-server t)
+;; (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+;;       TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+;;       TeX-source-correlate-start-server t)
 
-(add-hook 'TeX-after-compilation-finished-functions
-	  #'TeX-revert-document-buffer)
+;; (add-hook 'TeX-after-compilation-finished-functions
+;; 	  #'TeX-revert-document-buffer)
 
-(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+;; (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
-(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+;; (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
 
-(use-package org-pdfview
-  :config
-  (add-to-list 'org-file-apps
-	       '("\\.pdf\\'" . (lambda (file link)
-				 (org-pdfview-open link)))))
+;; (use-package org-pdfview
+;;   :config
+;;   (add-to-list 'org-file-apps
+;; 	       '("\\.pdf\\'" . (lambda (file link)
+;; 				 (org-pdfview-open link)))))
 
-(use-package org-ref
-  :after helm-bibtex
-  :init
-  (require 'bibtex)
-  (require 'org-ref-helm)
-  (setq bibtex-autokey-year-length 4
-	bibtex-autokey-name-year-separator "-"
-	bibtex-autokey-year-title-separator "-"
-	bibtex-autokey-titleword-separator "-"
-	bibtex-autokey-titlewords 2
-	bibtex-autokey-titlewords-stretch 1
-	bibtex-autokey-titleword-lenght 5
-	bibtex-completion-bibliography '("~/Temp-Archive/Files/global.bib")
-	org-ref-insert-link-function 'org-ref-link-hydra/body
-	org-ref-insert-cite-function 'org-ref-cite-insert-helm
-	org-ref-insert-label-function 'org-ref-insert-label-link
-	org-ref-insert-ref-function 'org-ref-insert-ref-link))
-  ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-  ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/bod)
+;; (use-package org-ref
+;;   :after helm-bibtex
+;;   :init
+;;   (require 'bibtex)
+;;   (require 'org-ref-helm)
+;;   (setq bibtex-autokey-year-length 4
+;; 	bibtex-autokey-name-year-separator "-"
+;; 	bibtex-autokey-year-title-separator "-"
+;; 	bibtex-autokey-titleword-separator "-"
+;; 	bibtex-autokey-titlewords 2
+;; 	bibtex-autokey-titlewords-stretch 1
+;; 	bibtex-autokey-titleword-lenght 5
+;; 	bibtex-completion-bibliography '("~/Temp-Archive/Files/global.bib")
+;; 	org-ref-insert-link-function 'org-ref-link-hydra/body
+;; 	org-ref-insert-cite-function 'org-ref-cite-insert-helm
+;; 	org-ref-insert-label-function 'org-ref-insert-label-link
+;; 	org-ref-insert-ref-function 'org-ref-insert-ref-link))
+;;   ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
+;;   ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/bod)
 
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory (file-truename "~/Temp-Archive/Nodes"))
+  (org-roam-directory (file-truename "~/Archive/Nodes"))
   (org-roam-completion-everywhere t)
   ;; (org-roam-capture-templates
   ;;  '(("r" "Reference Core" plain
@@ -388,9 +388,9 @@
 ;;   :config
 ;;   (require 'org-ref))
 
-(use-package org-transclusion
-  :after org)
-(define-key global-map (kbd "<f12>") #'org-transclusion-add)
+;; (use-package org-transclusion
+;;   :after org)
+;; (define-key global-map (kbd "<f12>") #'org-transclusion-add)
 
 ;; Helm and Dependencies
 (use-package async)
