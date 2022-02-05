@@ -1,5 +1,19 @@
-(setq package-enable-at-startup nil)
 
+#+Author Que Fanning
+#+Title Emacs Literate Configuration
+#+PROPERTY: header-args:emacs-lisp :tangle ~/Voyager-Config/emacs.d/init.el
+
+* Package Management
+*** Disable Package.el
+Disables the default Emacs package manager.
+#+begin_src emacs-lisp
+(setq package-enable-at-startup nil)
+#+end_src
+
+*** Straight.el
+Checks if Straight.el is present if it is not found install it from Github.
+
+#+begin_src emacs-lisp
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
@@ -14,20 +28,28 @@
   (load bootstrap-file nil 'nomessage))
 
 (setq straight-repository-branch "develop")
+#+end_src
 
-(straight-use-package
- '(use-package
-    :type git
-    :host github
-    :repo "jwiegley/use-package"))
+*** Use-package
+Configures use-package installation macro
+#+begin_src emacs-lisp
+  (straight-use-package
+   '(use-package
+      :type git
+      :host github
+      :repo "jwiegley/use-package"))
 
-(eval-when-compile
-  (add-to-list 'load-path "~/.emacs.d/straight/build")
-  (require 'use-package))
+  (eval-when-compile
+    (add-to-list 'load-path "~/.emacs.d/straight/build")
+    (require 'use-package))
 
-(setq straight-use-package-by-default t) ;Adds the straight argument to all use-package statements.
-(setq use-package-always-ensure t) ;Adds the require argument to all use-package statements.
+  (setq straight-use-package-by-default t) ;Adds the straight argument to all use-package statements.
+  (setq use-package-always-ensure t) ;Adds the require argument to all use-package statements.
+#+end_src
 
+* General Configuration
+** General UI
+#+begin_src emacs-lisp
 (scroll-bar-mode -1) ;Removes scrollbars from UI.
 (tool-bar-mode -1) ;Removes toolbar from UI.
 (set-fringe-mode 5) ;Adds spacing from edge of frame.
@@ -39,23 +61,42 @@
 (setq-default fill-column 80) ; Visual line wrap after 80 characters.
 (setq inhibit-startup-message t) ; Disables default landing screen, scratch buffer used instead.
 (setq visible-bell t) ; Enables visual alert bell.
+#+end_src
 
+*** Disable line numbers
+Disables line numbers in specified major mode buffers.
+#+begin_src emacs-lisp
 (dolist (mode '(pdf-view-mode-hook
 		term-mode-hook
 		shell-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+end_src
 
+** General Behavior
+#+begin_src emacs-lisp
 (setq vc-follow-symlinks t) ;Follows symlinks with out prompting user.
+#+end_src
 
+*** System Location
+Sets location data used by Emacs
+#+begin_src emacs-lisp
 (setq calendar-latitude 42.33)
 (setq calendar-longitude -83.04)
-(setq calendar-location-name "Detroit,MI")
+(setq calendar-location-name "Detroit,MI") 
+#+end_src
 
+*** Frame Size
+On start up, maximizes and the fullscreens frame.
+#+begin_src emacs-lisp
 ;(custom-set-variables
 ; '(initial-frame-alist (quote ((fullscreen . maximized)))))
 ;(add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
+#+end_src
 
+** Fonts
+Configures default fonts. Relevant system files must be installed.
+#+begin_src emacs-lisp
 (defvar runemacs/default-font-size 150)
 
 (set-face-attribute 'default nil
@@ -72,52 +113,129 @@
 		    :font "Overpass"
 		    :weight 'regular
 		    :height 220)
+		    
+                      
+#+end_src
 
+#+begin_src emacs-lisp
+#+end_src
 
+* General Packages
+Groups of smaller supporting packages
 
+** Visual Changes
+Change the way Emacs looks.
+
+*** All the icons
+Adds specialty fonts for icons. After first time installation (M-x all-the-icons-install-fonts) must be run.
+
+#+begin_src emacs-lisp
 (use-package all-the-icons)
+#+end_src
 
+*** Doom Themes
+Allows use of Doom Emacs themes, and specifies doom-city-lights.
+
+#+begin_src emacs-lisp
 (use-package doom-themes
   :init (load-theme 'doom-city-lights t))
+#+end_src
 
+*** Doom Modeline
+Installs the Doom Emacs modeline. Requires all-the-icons package.
+
+#+begin_src emacs-lisp
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
+#+end_src
 
+*** Rainbow Delimiters
+Adds a seperate color of highlighting to each paren pair based on level. Also highlight all parens after an unbalanced pair.
+
+#+begin_src emacs-lisp
 (use-package rainbow-delimiters
   :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+#+end_src
 
+*** Emojify
+Adds emoji support to buffers.
+
+#+begin_src emacs-lisp
 (use-package emojify)
+#+end_src
 
+*** FlySpell
+Spell checker.
+
+#+begin_src emacs-lisp
 (dolist (hook '(text-mode-hook))
   (add-hook hook (lambda ()
 		  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
 		   (flyspell-mode 1))))
+#+end_src
 
+****** TODO Configure if statement based on what machine is being used.
+
+*** TODO install FlyCheck
+
+*** Undo Tree
+System wide undo
+
+#+begin_src emacs-lisp
 (use-package undo-tree)
 (global-undo-tree-mode 1)
+#+end_src
 
+** Command Help
+Helps user find command keys, or describes available commands.
+
+*** Helpful
+Improves function help descriptions.
+
+#+begin_src emacs-lisp
 (use-package helpful
   :commands (helpful-callable helpful-variable helpful-command helpful-key)
   :bind
   ([remap describe-command] . helpful-command)
   ([remap describe-key] . helpful-key))
+#+end_src
 
+*** Which-Key
+Shows available key commands in mini-buffer after a delay.
+
+#+begin_src emacs-lisp
 (use-package which-key
   :diminish which-key-mode
   :config
   (which-key-mode)
   (setq which-key-idle-delay 1))
+#+end_src
 
+* Keybindings and User Input
+** Global Keybindings
+System wide keybindings
+
+#+begin_src emacs-lisp
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 (global-set-key (kbd "C-S-v") 'clipboard-yank)
 (global-set-key (kbd "C-S-c") 'clipboard-kill-ring-save)
+#+end_src
 
+*** TODO Revert Buffer
+Creates a hotkey to revert the current buffer without a confirmation prompt.
+
+#+begin_src emacs-lisp
 ;(defun revert-buffer-no-confirm ()
 ;  (interactive) (revert-buffer t t))
 
 ;(define-key global-map (kbd "C-u u b") 'revert-buffer-no-confirm)
+#+end_src
 
+** EVIL
+Vim style editing controls in Emacs.
+
+#+begin_src emacs-lisp
 (use-package evil
   :init
   (setq evil-want-integration t
@@ -130,7 +248,12 @@
   (evil-mode 1)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
+#+end_src
 
+*** EVIL Keybindings
+System wide EVIL keybinds 
+
+#+begin_src emacs-lisp
 (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
 (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
 
@@ -141,15 +264,29 @@
 ;; Sets the starting EVIL state for certain modes.
 (evil-set-initial-state 'messages-buffer-mode 'normal)
 (evil-set-initial-state 'dashboard-mode 'normal)
+#+end_src
 
+** EVIL Collection
+Assigns Vim style controls to other major modes.
+
+#+begin_src emacs-lisp
 (use-package evil-collection)
+#+end_src
 
+*** Evil Mode State List
+Creates hooks for listed states to enable EVIL controls
+#+begin_src emacs-lisp
 (dolist (mode '(custom-mode
 		   eshell-mode
 		   git-rebase-mode
 		   term-mode))
   (add-to-list 'evil-emacs-state-modes mode))
+#+end_src
 
+** General
+Used to configure keybindings with EVIL.
+
+#+begin_src emacs-lisp
 (use-package general
   :after evil
   :config
@@ -160,9 +297,25 @@
 
   (runemacs/leader-keys
     "t" '(:ignore t :which-key "toggles")))
+#+end_src
 
+** Hydra
+Creates complex system wide keybindings.
+
+#+begin_src emacs-lisp
 (use-package hydra)
+#+end_src
 
+* Org Mode
+Configuration for Org mode and related sub-packages.
+
+*** Org Mode Core
+**** Custom Functions
+Groups of custom behaviors used in the core config.
+
+***** Indentations and autofill
+
+#+begin_src emacs-lisp
 (defun runemacs/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
@@ -172,13 +325,25 @@
   (setq evil-auto-indent nil
 	     org-src-preserve-indentation nil
 	     org-edit-src-content-indentation 0))
+#+end_src
 
+***** Org Fonts
+
+#+begin_src emacs-lisp
 (defun runemacs/org-font-setup ()
+#+end_src
 
+****** Replace hyphen with dot for sub-headings
+
+#+begin_src emacs-lisp
 (font-lock-add-keywords 'org-mode
 			'(("^*\\([-])\\) "
 			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+#+end_src
 
+****** Set face size for sub-headings
+
+#+begin_src emacs-lisp
 (dolist (face '((org-level-1 . 1.2)
 		      (org-level-2 . 1.1)
 		      (org-level-3 . 1.05)
@@ -188,44 +353,65 @@
 		      (org-level-7 . 1.1)
 		      (org-level-8 . 1.1)))
   (set-face-attribute (car face) nil :font "Overpass" :weight 'regular :height (cdr face)))
+#+end_src
 
-(set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
-(set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
-(set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
-(set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-(set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-(set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
-(set-face-attribute 'line-number nil :inherit 'fixed-pitch)
-(set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+****** Set fixed pitch where appropriate
 
+#+begin_src emacs-lisp
+
+  (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil     :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-table nil    :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
+  (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+#+end_src
+**** Org Config
+Defines core Emacs behavior
+
+#+begin_src emacs-lisp
 (use-package org
+#+end_src
+***** Calls previously defined Org functions
+#+begin_src emacs-lisp
+  :hook (org-mode . runemacs/org-mode-setup)
+        (org-mode . runemacs/org-font-setup)
+#+end_src
 
-:hook (org-mode . runemacs/org-mode-setup)
-      (org-mode . runemacs/org-font-setup)
+***** Configures Org Behavior
+#+begin_src emacs-lisp
+  :config
+  (setq org-ellipsis " ▾"
+        org-hide-emphasis-markers t	
+        org-src-fontify-natively t
+        org-fontify-quote-and-verse-blocks t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 2
+        org-hide-block-startup nil
+        org-src-preserve-indentation nil
+        org-startup-folded 'content
+        org-cycle-separator-lines 2
+	org-confirm-babel-evaluate nil
+        org-capture-bookmark nil)
 
-:config
-(setq org-ellipsis " ▾"
-      org-hide-emphasis-markers t	
-      org-src-fontify-natively t
-      org-fontify-quote-and-verse-blocks t
-      org-src-tab-acts-natively t
-      org-edit-src-content-indentation 2
-      org-hide-block-startup nil
-      org-src-preserve-indentation nil
-      org-startup-folded 'content
-      org-cycle-separator-lines 2
-      org-confirm-babel-evaluate nil
-      org-capture-bookmark nil)
+#+end_src
 
+***** Set Org Keybinds
+#+begin_src emacs-lisp
 (evil-define-key '(normal insert visual) org-mode-map (kbd "C-j") 'org-next-visible-heading)
 (evil-define-key '(normal insert visual) org-mode-map (kbd "C-k") 'org-previous-visible-heading)
 
 (evil-define-key '(normal insert visual) org-mode-map (kbd "M-j") 'org-metadown)
 (evil-define-key '(normal insert visual) org-mode-map (kbd "M-k") 'org-metaup)
+#+end_src
 
+***** Org Babel (and close to org statement)
+#+begin_src emacs-lisp
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
@@ -234,54 +420,125 @@
    (scheme . t)))
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes))
+#+end_src
 
-(defun runemacs/org-babel-tangle-config ()
-(when (string-equal (buffer-file-name)
-                    (expand-file-name "~/Voyager-Config/emacs.d/system.org"))
-  (let ((org-confirm-babel-evaluate nil))
-    (org-babel-tangle))))
+****** TODO add (ledger . t) once ledger-mode is installed.
 
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+****** Auto-Tangle Function
+Automatically run 'org-babel-tange' whenever target file is saved.
 
+#+begin_src emacs-lisp
+  (defun runemacs/org-babel-tangle-config ()
+  (when (string-equal (buffer-file-name)
+                      (expand-file-name "~/Voyager-Config/emacs.d/system.org"))
+    (let ((org-confirm-babel-evaluate nil))
+      (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+#+end_src
+
+**** Org Keybinds
+***** TODO create org-insert commands
+
+#+begin_src emacs-lisp
 ;; (define-key org-mode-map (kbd "C-c i c") 'completion-at-point)
 ;; (define-key org-mode-map (kbd "C-c i r") 'org-ref-insert-link)
 ;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
 ;; (define-key org-mode-map (kbd "C-c i t") 'org-transclusion-add)
+#+end_src
+**** Org Supporting Packages
+***** Org Sub-packages
+Packages included in org that only need to be enabled.
+****** Org tempo
+Creates templates for SRC blocks. Called with <xx (xx = template key) followed by tab.
 
+#+begin_src emacs-lisp
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+#+end_src
 
+***** Org Extension Packages
+External packages that add functionality to Org
+
+****** Org Bullets
+Changes visual rendering of heading level bullets
+
+#+begin_src emacs-lisp
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)
   :custom
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+#+end_src
 
+****** Org Transclusion
+Allows sections of one file to be dynamically included into another.
+
+#+begin_src emacs-lisp
 (use-package org-transclusion
   :after org)
 (define-key global-map (kbd "<f12>") #'org-transclusion-add)
+#+end_src
 
+******* TODO Remap transclusion add key
+
+****** Visual Fill Column
+
+******* Custom Visual Fill Function
+
+#+begin_src emacs-lisp
 (defun runemacs/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
 	       visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
+#+end_src
 
+******* Install Package
+
+#+begin_src emacs-lisp
 (use-package visual-fill-column
   :hook (org-mode . runemacs/org-mode-visual-fill))
+#+end_src
 
+****** Publishing 
+Packages that control the exporting and viewing of documents.
+
+******* LaTeX
+Type setting program
+******** LaTeX Engine
+Used to render LaTeX code 
+#+begin_src emacs-lisp
 (use-package tex
   :straight auctex)
 
 (setq latex-run-command "xelatex"
       org-latex-compiler "xelatex")
+#+end_src
 
+******** LaTeX Preview
+Shows dynamic preview of document as a PDF.
+
+#+begin_src emacs-lisp
 (use-package latex-preview-pane)
+#+end_src
 
+******* PDF
+Configures how PDFs are rendered.
+
+******** Org PDF Viewer
+Calls PDF-Tools as default PDF viewer.
+
+#+begin_src emacs-lisp
 (use-package org-pdfview
   :config
   (add-to-list 'org-file-apps
 	       '("\\.pdf\\'" . (lambda (file link)
 				 (org-pdfview-open-link)))))
+#+end_src
 
+******** PDF-Tools
+PDF renderer with support for Vim controls
+
+#+begin_src emacs-lisp
 (use-package pdf-tools
   :defer t
   :pin manual
@@ -289,7 +546,10 @@
   (pdf-tools-install)
   (setq-default pdf-view-display-size 'fit-width)
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+#+end_src
 
+********* Configure Vim Keybindings (and close pdf-tools statement)
+#+begin_src emacs-lisp
 :bind (:map pdf-view-mode-map
 	      ("s" . pdf-occur)
 	      ("g" . pdf-view-first-page)
@@ -308,7 +568,12 @@
 :custom
 (pdf-annot-activate-created-annotations t "automatically annotate highlights")
 (pdf-view-active-region nil))
+	    
+#+end_src
 
+********* Additional Configuration
+
+#+begin_src emacs-lisp
 (setq TeX-view-program-selection '((output-pdf "PDF Tools"))
       TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
       TeX-source-correlate-start-server t)
@@ -319,11 +584,27 @@
 (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
 (add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+#+end_src
 
+******* HTML
+HTML backend to export to Haunt static site generator.
+
+#+begin_src emacs-lisp
 (use-package ox-haunt)
 (with-eval-after-load 'ox
   (require 'ox-haunt))
+#+end_src
 
+****** Knowledge Base
+Personal knowledge and refrence management
+
+******* Roam Network
+Zettlekasten style note taking and file management system.
+
+******** Org Roam
+Adds Zettlekasten functionality to Emacs
+
+#+begin_src emacs-lisp
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
@@ -353,16 +634,42 @@
   (org-roam-db-autosync-mode)
   (require 'org-roam-protocol)
   (org-roam-setup))
+#+end_src
 
+********* Configure Sub-directory for Journal Entries
+
+#+begin_src emacs-lisp
 (setq org-roam-dailies-directory "Journal")
+#+end_src
 
+********* TODO Add Roam capture templates
+
+********* TODO Fix capture and insert keybinds
+
+******** Org Roam Bibtex
+Adds Bibliography fuctionality to Roam
+
+#+begin_src emacs-lisp
 (use-package org-roam-bibtex
   :after org-roam
   :config
   (require 'org-ref))
+#+end_src
 
+******** Anki
+Allows roam nodes to be converted to anki flashcards throuh the addition of specific meta-data.
+
+#+begin_src emacs-lisp
 (use-package anki-editor)
+#+end_src
 
+******* Bibliograph
+Packages that manage global bibliography library and citation templating.
+
+******** Org Ref
+Core bibliography management package.
+
+#+begin_src emacs-lisp
 (use-package org-ref
   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
   :init
@@ -380,12 +687,33 @@
 	org-ref-insert-cite-function 'org-ref-cite-insert-helm
 	org-ref-insert-label-function 'org-ref-insert-label-link
 	org-ref-insert-ref-function 'org-ref-insert-ref-link))
+#+end_src
 
-;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body)
+********* TODO Configure insert keys
 
+#+begin_src emacs-lisp
+  ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
+  ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body)
+#+end_src
+
+
+****** Completion Framework
+******* Helm
+General completion framework
+******** Dependencies
+Packages required for Helm to function
+
+********* Async
+Enables limited multi threading within Emacs
+
+#+begin_src emacs-lisp
 (use-package async)
+#+end_src
 
+********* Dired Async
+Enables certian terminal commands to be preformed asyncronously
+
+#+begin_src emacs-lisp
 (use-package dired-async
   :straight async
   :diminish (dired-async-mode)
@@ -393,12 +721,29 @@
   (with-eval-after-load 'dired (dired-async-mode)))
 
 (dired-async-mode 1)
+#+end_src
 
+******** Helm Core
+Main Helm configuration
+
+#+begin_src emacs-lisp
 (use-package helm
   :config
   (require 'helm-config)
   (helm-mode 1))
+#+end_src
 
+********* Helm Keybinds
+
+#+begin_src emacs-lisp
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
+#+end_src
+
+******** Helm Extensions
+
+********* TODO helm-bibtext
+(use-package helm-bibtex)
+
+******* TODO Swiper
