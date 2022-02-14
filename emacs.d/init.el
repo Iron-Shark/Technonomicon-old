@@ -59,18 +59,18 @@
 (defvar runemacs/default-font-size 150)
 
 (set-face-attribute 'default nil
-		    :font "JetBrains Mono"
+		    :font "Fira Code"
 		    :weight 'semibold
 		    :height 180)
 
 (set-face-attribute 'fixed-pitch nil
-		    :font "JetBrains Mono"
+		    :font "Fira Code"
 		    :weight 'semibold
 		    :height 180)
 
 (set-face-attribute 'variable-pitch nil
-		    :font "Overpass"
-		    :weight 'regular
+		    :font "Fira Sans"
+		    :weight 'light
 		    :height 220)
 
 
@@ -235,14 +235,6 @@
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
-(defun runemacs/org-babel-tangle-config ()
-(when (string-equal (buffer-file-name)
-                    (expand-file-name "~/Voyager-Config/emacs.d/system.org"))
-  (let ((org-confirm-babel-evaluate nil))
-    (org-babel-tangle))))
-
-(add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
-
 ;; (define-key org-mode-map (kbd "C-c i c") 'completion-at-point)
 ;; (define-key org-mode-map (kbd "C-c i r") 'org-ref-insert-link)
 ;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
@@ -402,3 +394,7 @@
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
+
+(use-package company)
+
+(add-hook 'after-init-hook 'global-company-mode)
