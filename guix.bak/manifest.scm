@@ -24,6 +24,13 @@
 	"nyxt"
 	"texlive"		;LaTeX engine
 	"texlive-latex-preview" ;LaTeX live preview
+	"emacs-pdf-tools"
+	"anki"
+	"blender"
+	"krita"
+	"inkscape"
+	"gimp"
+	"openscad"
 	))
 
 ;;after updating run "guix package --manifest=.dotfiles/guix/manifest.scm"
