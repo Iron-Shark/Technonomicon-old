@@ -353,7 +353,17 @@
   :config
   (require 'org-ref))
 
-(use-package anki-editor)
+(use-package org-fc
+  :straight
+  (org-fc
+   :type git :repo "https://git.sr.ht/~l3kn/org-fc"
+   :files (:defaults "awk" "demo.org"))
+  :custom
+  (org-fc-directories '("~/Archive/Nodes/"
+			"~/Archive/Files/"
+			"~/Projects"))
+  :config
+  (require 'org-fc-hydra))
 
 (use-package org-ref
   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
@@ -395,6 +405,31 @@
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 
-(use-package company)
+(use-package company
+  :bind (("C-c ." . company-complete)))
+
+(setq company-tooltip-limit 10
+      company-show-numbers t
+      company-idle-delay 0.3
+      company-echo-delay 0)
+      
+      
 
 (add-hook 'after-init-hook 'global-company-mode)
+
+(use-package company-fuzzy
+  :hook (company-mode . company-fuzzy-mode))
+
+(global-company-fuzzy-mode 1)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(warning-suppress-log-types '((comp))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )

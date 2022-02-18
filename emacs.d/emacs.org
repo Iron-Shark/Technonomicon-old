@@ -641,14 +641,31 @@ Adds Bibliography fuctionality to Roam
   (require 'org-ref))
 #+end_src
 
-******** Anki
+******** Org-FC
 Allows roam nodes to be converted to anki flashcards throuh the addition of specific meta-data.
 
 #+begin_src emacs-lisp
-(use-package anki-editor)
+(use-package org-fc
+  :straight
+  (org-fc
+   :type git :repo "https://git.sr.ht/~l3kn/org-fc"
+   :files (:defaults "awk" "demo.org"))
+  :custom
+  (org-fc-directories '("~/Archive/Nodes/"
+			"~/Archive/Files/"
+			"~/Projects"))
+  :config
+  (require 'org-fc-hydra))
 #+end_src
 
-******* Bibliograph
+*******  Embedded Media
+
+******** TODO [[https://github.com/abo-abo/org-download][Org-Download]]
+
+
+******** TODO [[https://github.com/flameshot-org/flameshot][Flameshot]]
+
+******* bibliograph
 Packages that manage global bibliography library and citation templating.
 
 ******** Org Ref
@@ -735,8 +752,26 @@ Main Helm configuration
 Installs company mode
 
 #+begin_src emacs-lisp
-(use-package company)
+(use-package company
+  :bind (("C-c ." . company-complete)))
+
+(setq company-tooltip-limit 10
+      company-show-numbers t
+      company-idle-delay 0.3
+      company-echo-delay 0)
+      
+      
 
 (add-hook 'after-init-hook 'global-company-mode)
+#+end_src
+******** TODO add ispell integration (setq company-ispell-dictionary (xxxx))
+
+******* Company Fuzzy Matching 
+
+#+begin_src emacs-lisp
+(use-package company-fuzzy
+  :hook (company-mode . company-fuzzy-mode))
+
+(global-company-fuzzy-mode 1)
 #+end_src
 
