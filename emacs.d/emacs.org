@@ -68,6 +68,7 @@ Disables line numbers in specified major mode buffers.
 (dolist (mode '(pdf-view-mode-hook
 		term-mode-hook
 		shell-mode-hook
+		eww-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 #+end_src
@@ -658,6 +659,22 @@ Allows roam nodes to be converted to anki flashcards throuh the addition of spec
   (require 'org-fc-hydra))
 #+end_src
 
+#+begin_src emacs-lisp
+(evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-flip-mode
+  (kbd "RET") 'org-fc-review-flip
+  (kbd "n") 'org-fc-review-flip
+  (kbd "s") 'org-fc-review-suspend-card
+  (kbd "q") 'org-fc-review-quit)
+
+(evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-rate-mode
+  (kbd "a") 'org-fc-review-rate-again
+  (kbd "h") 'org-fc-review-rate-hard
+  (kbd "g") 'org-fc-review-rate-good
+  (kbd "e") 'org-fc-review-rate-easy
+  (kbd "s") 'org-fc-review-rate-suspend-card
+  (kbd "q") 'org-fc-review-quit)
+#+end_src
+
 *******  Embedded Media
 
 ******** TODO [[https://github.com/abo-abo/org-download][Org-Download]]
@@ -747,7 +764,13 @@ Main Helm configuration
 
 ********* TODO helm-bibtext
 (use-package helm-bibtex)
-******* TODO Swiper
+******** Helm Swiper 
+Replaces normal I-search with Swiper.
+
+#+begin_src emacs-lisp
+(use-package swiper-helm)
+#+end_src
+
 ******* Company
 Installs company mode
 

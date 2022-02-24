@@ -43,6 +43,7 @@
 (dolist (mode '(pdf-view-mode-hook
 		term-mode-hook
 		shell-mode-hook
+		eww-mode-hook
 		eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
@@ -365,6 +366,20 @@
   :config
   (require 'org-fc-hydra))
 
+(evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-flip-mode
+  (kbd "RET") 'org-fc-review-flip
+  (kbd "n") 'org-fc-review-flip
+  (kbd "s") 'org-fc-review-suspend-card
+  (kbd "q") 'org-fc-review-quit)
+
+(evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-rate-mode
+  (kbd "a") 'org-fc-review-rate-again
+  (kbd "h") 'org-fc-review-rate-hard
+  (kbd "g") 'org-fc-review-rate-good
+  (kbd "e") 'org-fc-review-rate-easy
+  (kbd "s") 'org-fc-review-rate-suspend-card
+  (kbd "q") 'org-fc-review-quit)
+
 (use-package org-ref
   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
   :init
@@ -405,6 +420,8 @@
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
 
+(use-package swiper-helm)
+
 (use-package company
   :bind (("C-c ." . company-complete)))
 
@@ -421,15 +438,3 @@
   :hook (company-mode . company-fuzzy-mode))
 
 (global-company-fuzzy-mode 1)
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(warning-suppress-log-types '((comp))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
