@@ -1,6 +1,6 @@
+#+PROPERTY: header-args:emacs-lisp :tangle ~/Voyager-Config/emacs.d/init.el
 #+Author Que Fanning
 #+Title Emacs Literate Configuration
-#+PROPERTY: header-args:emacs-lisp :tangle ~/Voyager-Config/emacs.d/init.el
 
 * Package Management
 *** Disable Package.el
@@ -59,18 +59,49 @@ Configures use-package installation macro
 (global-visual-line-mode t) ;Enables visual line wrapping in buffers.
 (setq-default fill-column 80) ; Visual line wrap after 80 characters.
 (setq inhibit-startup-message t) ; Disables default landing screen, scratch buffer used instead.
-(setq visible-bell t) ; Enables visual alert bell.
+(setq visible-bell t    ; Enables visual alert bell.
+      ring-bell-function 'ignore) ; Disable sound bell.
+
 #+end_src
 
 *** Disable line numbers
 Disables line numbers in specified major mode buffers.
 #+begin_src emacs-lisp
 (dolist (mode '(pdf-view-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eww-mode-hook
-		eshell-mode-hook))
+                term-mode-hook
+                shell-mode-hook
+                eww-mode-hook
+                eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+#+end_src
+
+*** Disable scratch buffer message
+#+begin_src emacs-lisp
+(setq-default initial-scratch-message nil)
+#+end_src
+
+*** Add date at time to mode line
+#+begin_src emacs-lisp
+(setq display-time-day-and-date t
+      display-time-24hr-format t
+      display-time-format "%Y-%m-%d %H:%M")
+
+(display-time-mode 1)
+#+end_src
+
+*** Auto update buffer if file on disk changes
+#+begin_src emacs-lisp
+(global-auto-revert-mode 1)
+#+end_src
+
+*** Change yes-and-no to y-and-n
+#+begin_src emacs-lisp
+(fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+*** Highlight line under point
+#+begin_src emacs-lisp
+(global-hl-line-mode 1)
 #+end_src
 
 ** General Behavior
@@ -78,12 +109,16 @@ Disables line numbers in specified major mode buffers.
 (setq vc-follow-symlinks t) ;Follows symlinks with out prompting user.
 #+end_src
 
-*** System Location
-Sets location data used by Emacs
+*** System Information
+Sets location and user data used by Emacs
 #+begin_src emacs-lisp
-(setq calendar-latitude 42.33)
-(setq calendar-longitude -83.04)
-(setq calendar-location-name "Detroit,MI") 
+(setq calendar-latitude 42.33
+      calendar-longitude -83.04
+      calendar-location-name "Detroit,MI"
+      user-full-name "Que Fanning"
+      user-real-login-name "Que Fanning"
+      user-login-name "Que"
+      user-mail-address "Que@ironshark.org")
 #+end_src
 
 *** Frame Size
@@ -95,27 +130,72 @@ On start up, maximizes and the fullscreens frame.
 #+end_src
 
 #+begin_src emacs-lisp
-(defvar runemacs/default-font-size 150)
+(defvar technonomicon/default-font-size 150)
 
 (set-face-attribute 'default nil
-		    :font "Fira Code"
-		    :weight 'semibold
-		    :height 180)
+                    :font "Fira Code"
+                    :weight 'semibold
+                    :height 180)
 
 (set-face-attribute 'fixed-pitch nil
-		    :font "Fira Code"
-		    :weight 'semibold
-		    :height 180)
+                    :font "Fira Code"
+                    :weight 'semibold
+                    :height 180)
 
 (set-face-attribute 'variable-pitch nil
-		    :font "Fira Sans"
-		    :weight 'light
-		    :height 220)
-		    
-                      
+                    :font "Fira Sans"
+                    :weight 'light
+                    :height 220)
+
+
 #+end_src
 
 #+begin_src emacs-lisp
+#+end_src
+
+*** Default to UTF-8
+#+begin_src emacs-lisp
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+#+end_src
+
+*** Remove trailing whitespace
+#+begin_src emacs-lisp
+  (add-hook 'before-save-hook #'whitespace-cleanup)
+  (setq-default sentence-end-double-space nil)
+#+end_src
+
+*** Designate a dedicated config file for custom
+#+begin_src emacs-lisp
+(setq custom-file "~/Voyager-Config/emacs.d/custom.el")
+(load custom-file)
+#+end_src
+
+*** Designate directory for back up files
+#+begin_src emacs-lisp
+(setq backup-directory-alist '(("." . "~/Neuromancer/Archive/Files/Emacs-Bak"))
+      backup-by-copying t
+      version-control t
+      vc-make-backup-files t
+      kept-old-versions 5
+      kept-new-versions 20
+      delete-old-versions t
+      history-length t
+      history-delete-duplicates t
+      savehist-save-minibuffer-history 1
+      savehist-additional-variables
+        '(kill-ring
+             search-ring
+             regexp-search-ring))
+
+
+(setq tramp-backup-directory-alist backup-directory-alist
+      auto-save-file-name-transforms '((".*" "~/Neuromancer/Archive/Files/Emacs-Bak/Auto-Saves" t))
+      savehist-file "~/Neuromancer/Archive/Files/Emacs-Bak/Save-hist")
+
+(savehist-mode 1)
+
 #+end_src
 
 * General Packages
@@ -169,8 +249,8 @@ Spell checker.
 #+begin_src emacs-lisp
 (dolist (hook '(text-mode-hook))
   (add-hook hook (lambda ()
-		  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
-		   (flyspell-mode 1))))
+                  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
+                   (flyspell-mode 1))))
 #+end_src
 
 ****** TODO Configure if statement based on what machine is being used.
@@ -183,6 +263,35 @@ System wide undo
 #+begin_src emacs-lisp
 (use-package undo-tree)
 (global-undo-tree-mode 1)
+#+end_src
+
+*** Emacs-Ligature
+#+begin_src emacs-lisp
+  (use-package ligature
+    :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
+    :config
+    ;; Enable the "www" ligature in every possible major mode
+    (ligature-set-ligatures 't '("www"))
+    ;; Enable traditional ligature support in eww-mode, if the
+    ;; `variable-pitch' face supports it
+    (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+    ;; Enable all Cascadia Code ligatures in programming modes
+    (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                         ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                         "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                         "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                         "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                         "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                         "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                         "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                         ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                         "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                         "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                         "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                         "\\\\" "://"))
+    ;; Enables ligature checks globally in all buffers. You can also do it
+    ;; per mode with `ligature-mode'.
+    (global-ligature-mode t))
 #+end_src
 
 ** Command Help
@@ -249,7 +358,7 @@ Vim style editing controls in Emacs.
 #+end_src
 
 *** EVIL Keybindings
-System wide EVIL keybinds 
+System wide EVIL keybinds
 
 #+begin_src emacs-lisp
 (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
@@ -275,9 +384,9 @@ Assigns Vim style controls to other major modes.
 Creates hooks for listed states to enable EVIL controls
 #+begin_src emacs-lisp
 (dolist (mode '(custom-mode
-		   eshell-mode
-		   git-rebase-mode
-		   term-mode))
+                   eshell-mode
+                   git-rebase-mode
+                   term-mode))
   (add-to-list 'evil-emacs-state-modes mode))
 #+end_src
 
@@ -288,12 +397,12 @@ Used to configure keybindings with EVIL.
 (use-package general
   :after evil
   :config
-  (general-create-definer runemacs/leader-keys
+  (general-create-definer technonomicon/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
 
-  (runemacs/leader-keys
+  (technonomicon/leader-keys
     "t" '(:ignore t :which-key "toggles")))
 #+end_src
 
@@ -314,42 +423,42 @@ Groups of custom behaviors used in the core config.
 ***** Indentations and autofill
 
 #+begin_src emacs-lisp
-(defun runemacs/org-mode-setup ()
+(defun technonomicon/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (display-line-numbers-mode 0)
   (setq evil-auto-indent nil
-	     org-src-preserve-indentation nil
-	     org-edit-src-content-indentation 0))
+             org-src-preserve-indentation nil
+             org-edit-src-content-indentation 0))
 #+end_src
 
 ***** Org Fonts
 
 #+begin_src emacs-lisp
-(defun runemacs/org-font-setup ()
+(defun technonomicon/org-font-setup ()
 #+end_src
 
 ****** Replace hyphen with dot for sub-headings
 
 #+begin_src emacs-lisp
 (font-lock-add-keywords 'org-mode
-			'(("^*\\([-])\\) "
-			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+                        '(("^*\\([-])\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 #+end_src
 
 ****** Set face size for sub-headings
 
 #+begin_src emacs-lisp
 (dolist (face '((org-level-1 . 1.2)
-		      (org-level-2 . 1.1)
-		      (org-level-3 . 1.05)
-		      (org-level-4 . 1.0)
-		      (org-level-5 . 1.1)
-		      (org-level-6 . 1.1)
-		      (org-level-7 . 1.1)
-		      (org-level-8 . 1.1)))
+                      (org-level-2 . 1.1)
+                      (org-level-3 . 1.05)
+                      (org-level-4 . 1.0)
+                      (org-level-5 . 1.1)
+                      (org-level-6 . 1.1)
+                      (org-level-7 . 1.1)
+                      (org-level-8 . 1.1)))
   (set-face-attribute (car face) nil :font "Overpass" :weight 'regular :height (cdr face)))
 #+end_src
 
@@ -377,15 +486,15 @@ Defines core Emacs behavior
 #+end_src
 ***** Calls previously defined Org functions
 #+begin_src emacs-lisp
-  :hook (org-mode . runemacs/org-mode-setup)
-        (org-mode . runemacs/org-font-setup)
+  :hook (org-mode . technonomicon/org-mode-setup)
+        (org-mode . technonomicon/org-font-setup)
 #+end_src
 
 ***** Configures Org Behavior
 #+begin_src emacs-lisp
   :config
   (setq org-ellipsis " ▾"
-        org-hide-emphasis-markers t	
+        org-hide-emphasis-markers t
         org-src-fontify-natively t
         org-fontify-quote-and-verse-blocks t
         org-src-tab-acts-natively t
@@ -394,7 +503,7 @@ Defines core Emacs behavior
         org-src-preserve-indentation nil
         org-startup-folded 'content
         org-cycle-separator-lines 2
-	org-confirm-babel-evaluate nil
+        org-confirm-babel-evaluate nil
         org-capture-bookmark nil)
 
 #+end_src
@@ -422,6 +531,12 @@ Defines core Emacs behavior
 
 ****** TODO add (ledger . t) once ledger-mode is installed.
 
+***** Configure Default Org Directory
+#+begin_src emacs-lisp
+(setq org-directory "~/Neuromancer/Grimoire/Org"
+      org-agenda-files '("~/Neuromancer"
+                              "~/Projects"))
+#+end_src
 
 **** Org Keybinds
 ***** TODO create org-insert commands
@@ -472,9 +587,9 @@ Allows sections of one file to be dynamically included into another.
 ******* Custom Visual Fill Function
 
 #+begin_src emacs-lisp
-(defun runemacs/org-mode-visual-fill ()
+(defun technonomicon/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
-	       visual-fill-column-center-text t)
+               visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 #+end_src
 
@@ -482,16 +597,16 @@ Allows sections of one file to be dynamically included into another.
 
 #+begin_src emacs-lisp
 (use-package visual-fill-column
-  :hook (org-mode . runemacs/org-mode-visual-fill))
+  :hook (org-mode . technonomicon/org-mode-visual-fill))
 #+end_src
 
-****** Publishing 
+****** Publishing
 Packages that control the exporting and viewing of documents.
 
 ******* LaTeX
 Type setting program
 ******** LaTeX Engine
-Used to render LaTeX code 
+Used to render LaTeX code
 #+begin_src emacs-lisp
 (use-package tex
   :straight auctex)
@@ -517,8 +632,8 @@ Calls PDF-Tools as default PDF viewer.
 (use-package org-pdfview
   :config
   (add-to-list 'org-file-apps
-	       '("\\.pdf\\'" . (lambda (file link)
-				 (org-pdfview-open-link)))))
+               '("\\.pdf\\'" . (lambda (file link)
+                                 (org-pdfview-open-link)))))
 #+end_src
 
 ******** PDF-Tools
@@ -537,24 +652,24 @@ PDF renderer with support for Vim controls
 ********* Configure Vim Keybindings (and close pdf-tools statement)
 #+begin_src emacs-lisp
 :bind (:map pdf-view-mode-map
-	      ("s" . pdf-occur)
-	      ("g" . pdf-view-first-page)
-	      ("G" . pdf-view-last-page)
-	      ("j" . pdf-view-next-page) 
-	      ("k" . pdf-view-previous-page)
-	      ("e" . pdf-view-goto-page)
-	      ("u" . pdf-view-revert-buffer)
-	      ("y" . pdf-view-kill-ring-save)
-	      ("m" . pdf-misc-display-metadata)
-	      ("b" . pdf-view-set-slice-from-bounding-box)
-	      ("r" . pdf-view-reset-slice)
-	      ("ad" . pdf-annot-delete)
-	      ("aa" . pdf-annot-attachment-dired)
-	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
+              ("s" . pdf-occur)
+              ("g" . pdf-view-first-page)
+              ("G" . pdf-view-last-page)
+              ("j" . pdf-view-next-page)
+              ("k" . pdf-view-previous-page)
+              ("e" . pdf-view-goto-page)
+              ("u" . pdf-view-revert-buffer)
+              ("y" . pdf-view-kill-ring-save)
+              ("m" . pdf-misc-display-metadata)
+              ("b" . pdf-view-set-slice-from-bounding-box)
+              ("r" . pdf-view-reset-slice)
+              ("ad" . pdf-annot-delete)
+              ("aa" . pdf-annot-attachment-dired)
+              ("<s-spc>" . pdf-view-scroll-down-or-next-page))
 :custom
 (pdf-annot-activate-created-annotations t "automatically annotate highlights")
 (pdf-view-active-region nil))
-	    
+
 #+end_src
 
 ********* Additional Configuration
@@ -565,7 +680,7 @@ PDF renderer with support for Vim controls
       TeX-source-correlate-start-server t)
 
 (add-hook 'TeX-after-compilation-finished-functions
-	  #'TeX-revert-document-buffer)
+          #'TeX-revert-document-buffer)
 
 (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
@@ -595,26 +710,26 @@ Adds Zettlekasten functionality to Emacs
   :init
   (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory (file-truename "~/Archive/Nodes"))
+  (org-roam-directory (file-truename "~/Neuromancer/Grimoire"))
   (org-roam-completion-everywhere t)
   ;; (org-roam-capture-templates
   ;;  '(("r" "Reference Core" plain
   ;;     (file "~/Temp-Archive/Files/Templates/Reference-Core.org")
-  ;; 	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;; 	    :unnarrowed t)
+  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+  ;;	    :unnarrowed t)
   ;;    ("d" "Default" plain
   ;;     "%?"
-  ;; 	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;; 	    :unnarrowed t)))
+  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+  ;;	    :unnarrowed t)))
   :bind (("C-c n l" . org-roam-buffer-toggle)
-	 ("C-c n f" . org-roam-node-find)
-	 ("C-c n g" . org-roam-graph)
-	 ("C-c n i" . org-roam-node-insert)
-	 ("C-c n c" . org-roam-capture)
-	 ("C-c n j" . org-roam-dailies-capture-today))
-	 ;; :map org-mode-map
-	 ;; ("C-c i c" . completion-at-point)
-	 ;; ("C-c i p" . org-insert-link)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ("C-c n j" . org-roam-dailies-capture-today))
+         ;; :map org-mode-map
+         ;; ("C-c i c" . completion-at-point)
+         ;; ("C-c i p" . org-insert-link)
   :config
   (setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
@@ -653,8 +768,8 @@ Allows roam nodes to be converted to anki flashcards throuh the addition of spec
    :files (:defaults "awk" "demo.org"))
   :custom
   (org-fc-directories '("~/Archive/Nodes/"
-			"~/Archive/Files/"
-			"~/Projects"))
+                        "~/Archive/Files/"
+                        "~/Projects"))
   :config
   (require 'org-fc-hydra))
 #+end_src
@@ -695,17 +810,17 @@ Core bibliography management package.
   (require 'bibtex) ; Requires bibtex org sub-module
   (require 'org-ref-helm) ; Requires the helm sub-module of Org-ref
   (setq bibtex-autokey-year-length 4
-	bibtex-autokey-name-year-separator "-"
-	bibtex-autokey-year-title-separator "-"
-	bibtex-autokey-titleword-separator "-"
-	bibtex-autokey-titlewords 2
-	bibtex-autokey-titlewords-stretch 1
-	bibtex-autokey-titleword-lenght 5
-	bibtex-completion-bibliography '("~/Archive/Files/Global/Bibliography.bib")
-	org-ref-insert-link-function 'org-ref-link-hydra/body
-	org-ref-insert-cite-function 'org-ref-cite-insert-helm
-	org-ref-insert-label-function 'org-ref-insert-label-link
-	org-ref-insert-ref-function 'org-ref-insert-ref-link))
+        bibtex-autokey-name-year-separator "-"
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator "-"
+        bibtex-autokey-titlewords 2
+        bibtex-autokey-titlewords-stretch 1
+        bibtex-autokey-titleword-lenght 5
+        bibtex-completion-bibliography '("~/Archive/Files/Global/Bibliography.bib")
+        org-ref-insert-link-function 'org-ref-link-hydra/body
+        org-ref-insert-cite-function 'org-ref-cite-insert-helm
+        org-ref-insert-label-function 'org-ref-insert-label-link
+        org-ref-insert-ref-function 'org-ref-insert-ref-link))
 #+end_src
 
 ********* TODO Configure insert keys
@@ -764,7 +879,7 @@ Main Helm configuration
 
 ********* TODO helm-bibtext
 (use-package helm-bibtex)
-******** Helm Swiper 
+******** Helm Swiper
 Replaces normal I-search with Swiper.
 
 #+begin_src emacs-lisp
@@ -782,14 +897,14 @@ Installs company mode
       company-show-numbers t
       company-idle-delay 0.3
       company-echo-delay 0)
-      
-      
+
+
 
 (add-hook 'after-init-hook 'global-company-mode)
 #+end_src
 ******** TODO add ispell integration (setq company-ispell-dictionary (xxxx))
 
-******* Company Fuzzy Matching 
+******* Company Fuzzy Matching
 
 #+begin_src emacs-lisp
 (use-package company-fuzzy
@@ -797,4 +912,3 @@ Installs company mode
 
 (global-company-fuzzy-mode 1)
 #+end_src
-

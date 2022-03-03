@@ -38,43 +38,94 @@
 (global-visual-line-mode t) ;Enables visual line wrapping in buffers.
 (setq-default fill-column 80) ; Visual line wrap after 80 characters.
 (setq inhibit-startup-message t) ; Disables default landing screen, scratch buffer used instead.
-(setq visible-bell t) ; Enables visual alert bell.
+(setq visible-bell t    ; Enables visual alert bell.
+      ring-bell-function 'ignore) ; Disable sound bell.
 
 (dolist (mode '(pdf-view-mode-hook
-		term-mode-hook
-		shell-mode-hook
-		eww-mode-hook
-		eshell-mode-hook))
+                term-mode-hook
+                shell-mode-hook
+                eww-mode-hook
+                eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(setq-default initial-scratch-message nil)
+
+(setq display-time-day-and-date t
+      display-time-24hr-format t
+      display-time-format "%Y-%m-%d %H:%M")
+
+(display-time-mode 1)
+
+(global-auto-revert-mode 1)
+
+(fset 'yes-or-no-p 'y-or-n-p)
+
+(global-hl-line-mode 1)
 
 (setq vc-follow-symlinks t) ;Follows symlinks with out prompting user.
 
-(setq calendar-latitude 42.33)
-(setq calendar-longitude -83.04)
-(setq calendar-location-name "Detroit,MI")
+(setq calendar-latitude 42.33
+      calendar-longitude -83.04
+      calendar-location-name "Detroit,MI"
+      user-full-name "Que Fanning"
+      user-real-login-name "Que Fanning"
+      user-login-name "Que"
+      user-mail-address "Que@ironshark.org")
 
 ;(custom-set-variables
 ; '(initial-frame-alist (quote ((fullscreen . maximized)))))
 ;(add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
 
-(defvar runemacs/default-font-size 150)
+(defvar technonomicon/default-font-size 150)
 
 (set-face-attribute 'default nil
-		    :font "Fira Code"
-		    :weight 'semibold
-		    :height 180)
+                    :font "Fira Code"
+                    :weight 'semibold
+                    :height 180)
 
 (set-face-attribute 'fixed-pitch nil
-		    :font "Fira Code"
-		    :weight 'semibold
-		    :height 180)
+                    :font "Fira Code"
+                    :weight 'semibold
+                    :height 180)
 
 (set-face-attribute 'variable-pitch nil
-		    :font "Fira Sans"
-		    :weight 'light
-		    :height 220)
+                    :font "Fira Sans"
+                    :weight 'light
+                    :height 220)
 
 
+
+(prefer-coding-system 'utf-8)
+(when (display-graphic-p)
+  (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
+
+(add-hook 'before-save-hook #'whitespace-cleanup)
+(setq-default sentence-end-double-space nil)
+
+(setq custom-file "~/Voyager-Config/emacs.d/custom.el")
+(load custom-file)
+
+(setq backup-directory-alist '(("." . "~/Neuromancer/Archive/Files/Emacs-Bak"))
+      backup-by-copying t
+      version-control t
+      vc-make-backup-files t
+      kept-old-versions 5
+      kept-new-versions 20
+      delete-old-versions t
+      history-length t
+      history-delete-duplicates t
+      savehist-save-minibuffer-history 1
+      savehist-additional-variables
+        '(kill-ring
+             search-ring
+             regexp-search-ring))
+
+
+(setq tramp-backup-directory-alist backup-directory-alist
+      auto-save-file-name-transforms '((".*" "~/Neuromancer/Archive/Files/Emacs-Bak/Auto-Saves" t))
+      savehist-file "~/Neuromancer/Archive/Files/Emacs-Bak/Save-hist")
+
+(savehist-mode 1)
 
 (use-package all-the-icons)
 
@@ -92,11 +143,37 @@
 
 (dolist (hook '(text-mode-hook))
   (add-hook hook (lambda ()
-		  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
-		   (flyspell-mode 1))))
+                  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
+                   (flyspell-mode 1))))
 
 (use-package undo-tree)
 (global-undo-tree-mode 1)
+
+(use-package ligature
+  :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
+  :config
+  ;; Enable the "www" ligature in every possible major mode
+  (ligature-set-ligatures 't '("www"))
+  ;; Enable traditional ligature support in eww-mode, if the
+  ;; `variable-pitch' face supports it
+  (ligature-set-ligatures 'eww-mode '("ff" "fi" "ffi"))
+  ;; Enable all Cascadia Code ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                       "\\\\" "://"))
+  ;; Enables ligature checks globally in all buffers. You can also do it
+  ;; per mode with `ligature-mode'.
+  (global-ligature-mode t))
 
 (use-package helpful
   :commands (helpful-callable helpful-variable helpful-command helpful-key)
@@ -146,48 +223,48 @@
 (use-package evil-collection)
 
 (dolist (mode '(custom-mode
-		   eshell-mode
-		   git-rebase-mode
-		   term-mode))
+                   eshell-mode
+                   git-rebase-mode
+                   term-mode))
   (add-to-list 'evil-emacs-state-modes mode))
 
 (use-package general
   :after evil
   :config
-  (general-create-definer runemacs/leader-keys
+  (general-create-definer technonomicon/leader-keys
     :keymaps '(normal insert visual emacs)
     :prefix "SPC"
     :global-prefix "C-SPC")
 
-  (runemacs/leader-keys
+  (technonomicon/leader-keys
     "t" '(:ignore t :which-key "toggles")))
 
 (use-package hydra)
 
-(defun runemacs/org-mode-setup ()
+(defun technonomicon/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (display-line-numbers-mode 0)
   (setq evil-auto-indent nil
-	     org-src-preserve-indentation nil
-	     org-edit-src-content-indentation 0))
+             org-src-preserve-indentation nil
+             org-edit-src-content-indentation 0))
 
-(defun runemacs/org-font-setup ()
+(defun technonomicon/org-font-setup ()
 
 (font-lock-add-keywords 'org-mode
-			'(("^*\\([-])\\) "
-			   (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
+                        '(("^*\\([-])\\) "
+                           (0 (prog1 () (compose-region (match-beginning 1) (match-end 1) "•"))))))
 
 (dolist (face '((org-level-1 . 1.2)
-		      (org-level-2 . 1.1)
-		      (org-level-3 . 1.05)
-		      (org-level-4 . 1.0)
-		      (org-level-5 . 1.1)
-		      (org-level-6 . 1.1)
-		      (org-level-7 . 1.1)
-		      (org-level-8 . 1.1)))
+                      (org-level-2 . 1.1)
+                      (org-level-3 . 1.05)
+                      (org-level-4 . 1.0)
+                      (org-level-5 . 1.1)
+                      (org-level-6 . 1.1)
+                      (org-level-7 . 1.1)
+                      (org-level-8 . 1.1)))
   (set-face-attribute (car face) nil :font "Overpass" :weight 'regular :height (cdr face)))
 
 (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
@@ -204,12 +281,12 @@
 
 (use-package org
 
-:hook (org-mode . runemacs/org-mode-setup)
-      (org-mode . runemacs/org-font-setup)
+:hook (org-mode . technonomicon/org-mode-setup)
+      (org-mode . technonomicon/org-font-setup)
 
 :config
 (setq org-ellipsis " ▾"
-      org-hide-emphasis-markers t	
+      org-hide-emphasis-markers t
       org-src-fontify-natively t
       org-fontify-quote-and-verse-blocks t
       org-src-tab-acts-natively t
@@ -236,6 +313,10 @@
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
+(setq org-directory "~/Neuromancer/Grimoire/Org"
+      org-agenda-files '("~/Neuromancer"
+                              "~/Projects"))
+
 ;; (define-key org-mode-map (kbd "C-c i c") 'completion-at-point)
 ;; (define-key org-mode-map (kbd "C-c i r") 'org-ref-insert-link)
 ;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
@@ -253,13 +334,13 @@
   :after org)
 (define-key global-map (kbd "<f12>") #'org-transclusion-add)
 
-(defun runemacs/org-mode-visual-fill ()
+(defun technonomicon/org-mode-visual-fill ()
   (setq visual-fill-column-width 100
-	       visual-fill-column-center-text t)
+               visual-fill-column-center-text t)
   (visual-fill-column-mode 1))
 
 (use-package visual-fill-column
-  :hook (org-mode . runemacs/org-mode-visual-fill))
+  :hook (org-mode . technonomicon/org-mode-visual-fill))
 
 (use-package tex
   :straight auctex)
@@ -272,8 +353,8 @@
 (use-package org-pdfview
   :config
   (add-to-list 'org-file-apps
-	       '("\\.pdf\\'" . (lambda (file link)
-				 (org-pdfview-open-link)))))
+               '("\\.pdf\\'" . (lambda (file link)
+                                 (org-pdfview-open-link)))))
 
 (use-package pdf-tools
   :defer t
@@ -284,20 +365,20 @@
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
 
 :bind (:map pdf-view-mode-map
-	      ("s" . pdf-occur)
-	      ("g" . pdf-view-first-page)
-	      ("G" . pdf-view-last-page)
-	      ("j" . pdf-view-next-page) 
-	      ("k" . pdf-view-previous-page)
-	      ("e" . pdf-view-goto-page)
-	      ("u" . pdf-view-revert-buffer)
-	      ("y" . pdf-view-kill-ring-save)
-	      ("m" . pdf-misc-display-metadata)
-	      ("b" . pdf-view-set-slice-from-bounding-box)
-	      ("r" . pdf-view-reset-slice)
-	      ("ad" . pdf-annot-delete)
-	      ("aa" . pdf-annot-attachment-dired)
-	      ("<s-spc>" . pdf-view-scroll-down-or-next-page))
+              ("s" . pdf-occur)
+              ("g" . pdf-view-first-page)
+              ("G" . pdf-view-last-page)
+              ("j" . pdf-view-next-page)
+              ("k" . pdf-view-previous-page)
+              ("e" . pdf-view-goto-page)
+              ("u" . pdf-view-revert-buffer)
+              ("y" . pdf-view-kill-ring-save)
+              ("m" . pdf-misc-display-metadata)
+              ("b" . pdf-view-set-slice-from-bounding-box)
+              ("r" . pdf-view-reset-slice)
+              ("ad" . pdf-annot-delete)
+              ("aa" . pdf-annot-attachment-dired)
+              ("<s-spc>" . pdf-view-scroll-down-or-next-page))
 :custom
 (pdf-annot-activate-created-annotations t "automatically annotate highlights")
 (pdf-view-active-region nil))
@@ -307,7 +388,7 @@
       TeX-source-correlate-start-server t)
 
 (add-hook 'TeX-after-compilation-finished-functions
-	  #'TeX-revert-document-buffer)
+          #'TeX-revert-document-buffer)
 
 (add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
 
@@ -321,26 +402,26 @@
   :init
   (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory (file-truename "~/Archive/Nodes"))
+  (org-roam-directory (file-truename "~/Neuromancer/Grimoire"))
   (org-roam-completion-everywhere t)
   ;; (org-roam-capture-templates
   ;;  '(("r" "Reference Core" plain
   ;;     (file "~/Temp-Archive/Files/Templates/Reference-Core.org")
-  ;; 	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;; 	    :unnarrowed t)
+  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+  ;;	    :unnarrowed t)
   ;;    ("d" "Default" plain
   ;;     "%?"
-  ;; 	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;; 	    :unnarrowed t)))
+  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+  ;;	    :unnarrowed t)))
   :bind (("C-c n l" . org-roam-buffer-toggle)
-	 ("C-c n f" . org-roam-node-find)
-	 ("C-c n g" . org-roam-graph)
-	 ("C-c n i" . org-roam-node-insert)
-	 ("C-c n c" . org-roam-capture)
-	 ("C-c n j" . org-roam-dailies-capture-today))
-	 ;; :map org-mode-map
-	 ;; ("C-c i c" . completion-at-point)
-	 ;; ("C-c i p" . org-insert-link)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ("C-c n j" . org-roam-dailies-capture-today))
+         ;; :map org-mode-map
+         ;; ("C-c i c" . completion-at-point)
+         ;; ("C-c i p" . org-insert-link)
   :config
   (setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
@@ -361,8 +442,8 @@
    :files (:defaults "awk" "demo.org"))
   :custom
   (org-fc-directories '("~/Archive/Nodes/"
-			"~/Archive/Files/"
-			"~/Projects"))
+                        "~/Archive/Files/"
+                        "~/Projects"))
   :config
   (require 'org-fc-hydra))
 
@@ -386,17 +467,17 @@
   (require 'bibtex) ; Requires bibtex org sub-module
   (require 'org-ref-helm) ; Requires the helm sub-module of Org-ref
   (setq bibtex-autokey-year-length 4
-	bibtex-autokey-name-year-separator "-"
-	bibtex-autokey-year-title-separator "-"
-	bibtex-autokey-titleword-separator "-"
-	bibtex-autokey-titlewords 2
-	bibtex-autokey-titlewords-stretch 1
-	bibtex-autokey-titleword-lenght 5
-	bibtex-completion-bibliography '("~/Archive/Files/Global/Bibliography.bib")
-	org-ref-insert-link-function 'org-ref-link-hydra/body
-	org-ref-insert-cite-function 'org-ref-cite-insert-helm
-	org-ref-insert-label-function 'org-ref-insert-label-link
-	org-ref-insert-ref-function 'org-ref-insert-ref-link))
+        bibtex-autokey-name-year-separator "-"
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator "-"
+        bibtex-autokey-titlewords 2
+        bibtex-autokey-titlewords-stretch 1
+        bibtex-autokey-titleword-lenght 5
+        bibtex-completion-bibliography '("~/Archive/Files/Global/Bibliography.bib")
+        org-ref-insert-link-function 'org-ref-link-hydra/body
+        org-ref-insert-cite-function 'org-ref-cite-insert-helm
+        org-ref-insert-label-function 'org-ref-insert-label-link
+        org-ref-insert-ref-function 'org-ref-insert-ref-link))
 
 ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
 ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body)
@@ -429,8 +510,8 @@
       company-show-numbers t
       company-idle-delay 0.3
       company-echo-delay 0)
-      
-      
+
+
 
 (add-hook 'after-init-hook 'global-company-mode)
 
