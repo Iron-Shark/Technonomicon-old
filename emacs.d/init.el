@@ -325,6 +325,15 @@
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 
+(add-hook 'bibtex-mode-hook 'flyspell-mose)
+(setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
+                                          ("file" "Link to source file" ":")
+                                          ("Summary" "Summary of source" ""))
+      bibtex-align-at-equal-sign t
+      bibtex-dialect 'biblatex)
+
+;(setq bib-files-directory pathe/to/directory)
+
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)
   :custom
@@ -402,7 +411,7 @@
   :init
   (setq org-roam-v2-ack t)
   :custom
-  (org-roam-directory (file-truename "~/Neuromancer/Grimoire"))
+  (org-roam-directory (file-truename "~/Neuromancer/Grimoire/Nodes"))
   (org-roam-completion-everywhere t)
   ;; (org-roam-capture-templates
   ;;  '(("r" "Reference Core" plain

@@ -557,6 +557,21 @@ Creates templates for SRC blocks. Called with <xx (xx = template key) followed b
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 #+end_src
+****** BibTex
+#+begin_src emacs-lisp
+(add-hook 'bibtex-mode-hook 'flyspell-mose)
+(setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
+                                          ("file" "Link to source file" ":")
+                                          ("Summary" "Summary of source" ""))
+      bibtex-align-at-equal-sign t
+      bibtex-dialect 'biblatex)
+#+end_src
+
+******* TODO Decide if this is needed
+#+begin_src emacs-lisp
+;(setq bib-files-directory pathe/to/directory)
+
+#+end_src
 
 ***** Org Extension Packages
 External packages that add functionality to Org
@@ -709,32 +724,52 @@ Adds Zettlekasten functionality to Emacs
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
+  (require 'org-roam-protocol)
   :custom
-  (org-roam-directory (file-truename "~/Neuromancer/Grimoire"))
-  (org-roam-completion-everywhere t)
-  ;; (org-roam-capture-templates
-  ;;  '(("r" "Reference Core" plain
-  ;;     (file "~/Temp-Archive/Files/Templates/Reference-Core.org")
-  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;;	    :unnarrowed t)
-  ;;    ("d" "Default" plain
-  ;;     "%?"
-  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;;	    :unnarrowed t)))
+  (org-roam-directory (file-truename "~/Neuromancer/Grimoire/Nodes"))
+  (org-roam-capture-templates
+   '(("r" "Reference Default" plain
+      (file "~/Neuromancer/Grimoire/Files/Templates/reference-default.org")
+            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+            :unnarrowed t)
+     ("d" "Default" plain
+      "%?"
+            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+            :unnarrowed t)))
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n c" . org-roam-capture)
+         ;; ("C-c n a a" . org-roam-alias-add)
+         ;; ("C-c n a A" . org-roam-alias-remove)
+         ;; ("C-c n a t" . org-roam-tag-add)
+         ;; ("C-c n a T" . org-roam-tag-remove)
+         ;; ("C-c n a r" . org-roam-ref-add)
+         ;; ("C-c n a R" . org-roam-ref-remove)
          ("C-c n j" . org-roam-dailies-capture-today))
          ;; :map org-mode-map
          ;; ("C-c i c" . completion-at-point)
          ;; ("C-c i p" . org-insert-link)
   :config
-  (setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag)))
+  (setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag))
+        org-roam-db-update-on-save t ; May need to be disable for performance
+        org-roam-completion-everywhere t
+        org-roam-dailies-directory "Journal/"
+        org-roam-dailes-capture-templates
+     '(("d" "Journal" plain
+      (file "~/Neuromancer/Grimoire/Files/Templates/journal.org")
+            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+            :unnarrowed t)))
   (org-roam-db-autosync-mode)
-  (require 'org-roam-protocol)
   (org-roam-setup))
+
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
 #+end_src
 
 ********* Configure Sub-directory for Journal Entries
