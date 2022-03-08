@@ -48,6 +48,12 @@
                 eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
+(dolist (mode '(term-mode-hook
+                shell-mode-hook
+                eww-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (company-mode 0))))
+
 (setq-default initial-scratch-message nil)
 
 (setq display-time-day-and-date t
@@ -60,9 +66,15 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)
 
+(setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
+
 (global-hl-line-mode 1)
 
 (setq vc-follow-symlinks t) ;Follows symlinks with out prompting user.
+
+(setq initial-buffer-choice "~/Neuromancer/Grimoire/Files/Globals/Splash.org")
+
+(setq-default indentd-tabs-mode nil)
 
 (setq calendar-latitude 42.33
       calendar-longitude -83.04
@@ -126,6 +138,19 @@
       savehist-file "~/Neuromancer/Archive/Files/Emacs-Bak/Save-hist")
 
 (savehist-mode 1)
+
+(setq history-delete-duplicates t
+      history-length            100 ; default is 30.
+      report-emacs-bug-no-explanations t
+      comint-prompt-read-only          t
+      uniquify-buffer-name-style       nil
+      register-preview-delay           nil
+      message-log-max                  1000
+      kill-ring-max                    100
+      mark-ring-max                    100
+      global-mark-ring-max             200)
+
+(setq org-startup-with-inline-images t)
 
 (use-package all-the-icons)
 
@@ -325,14 +350,11 @@
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 
-(add-hook 'bibtex-mode-hook 'flyspell-mose)
 (setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
                                           ("file" "Link to source file" ":")
                                           ("Summary" "Summary of source" ""))
       bibtex-align-at-equal-sign t
       bibtex-dialect 'biblatex)
-
-;(setq bib-files-directory pathe/to/directory)
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode)
@@ -410,39 +432,73 @@
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
-  :custom
-  (org-roam-directory (file-truename "~/Neuromancer/Grimoire/Nodes"))
-  (org-roam-completion-everywhere t)
-  ;; (org-roam-capture-templates
-  ;;  '(("r" "Reference Core" plain
-  ;;     (file "~/Temp-Archive/Files/Templates/Reference-Core.org")
-  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;;	    :unnarrowed t)
-  ;;    ("d" "Default" plain
-  ;;     "%?"
-  ;;	    :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-  ;;	    :unnarrowed t)))
+  (require 'org-roam-protocol)
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
          ("C-c n i" . org-roam-node-insert)
          ("C-c n c" . org-roam-capture)
+         ;; ("C-c n a a" . org-roam-alias-add)
+         ;; ("C-c n a A" . org-roam-alias-remove)
+         ;; ("C-c n a t" . org-roam-tag-add)
+         ;; ("C-c n a T" . org-roam-tag-remove)
+         ;; ("C-c n a r" . org-roam-ref-add)
+         ;; ("C-c n a R" . org-roam-ref-remove)
          ("C-c n j" . org-roam-dailies-capture-today))
-         ;; :map org-mode-map
-         ;; ("C-c i c" . completion-at-point)
-         ;; ("C-c i p" . org-insert-link)
+  ;; :map org-mode-map
+  ;; ("C-c i c" . completion-at-point)
+  ;; ("C-c i p" . org-insert-link)
+  :custom
+        (org-roam-db-update-on-save t) ; May need to be disable for performance
+        (org-roam-completion-everywhere t)
+        (org-roam-directory "~/Neuromancer/Grimoire/Nodes")
+        (org-roam-dailies-directory "Journal/")
+        (org-roam-dailes-capture-templates
+        '(("d" "Journal" plain
+           (file "~/Neuromancer/Grimoire/Files/Templates/journal.org")
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
+
+       (org-roam-capture-templates
+       '(("l" "Literature Note Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/litterature-default.org")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("r" "Reference Summary" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/reference-default.org")
+          :if-new (file+head "references/${citekey}.org" "#+title: ${title}\n")
+          :unarrowed t)
+
+         ("s" "Zettle Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/zettle-default.org")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("d" "Default" plain
+          "%?"
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)))
+
   :config
-  (setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  (require 'org-roam-protocol)
-  (org-roam-setup))
+       (org-roam-db-autosync-mode)
+       (org-roam-setup))
+
+(add-to-list 'display-buffer-alist
+             '("\\*org-roam\\*"
+               (display-buffer-in-direction)
+               (direction . right)
+               (window-width . 0.33)
+               (window-height . fit-window-to-buffer)))
+
+(setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag)))
 
 (setq org-roam-dailies-directory "Journal")
 
 (use-package org-roam-bibtex
-  :after org-roam
-  :config
-  (require 'org-ref))
+  :after org-roam)
+
+(setq orb-preformat-keywords '("citekey" "author" "date"))
 
 (use-package org-fc
   :straight
@@ -482,7 +538,7 @@
         bibtex-autokey-titlewords 2
         bibtex-autokey-titlewords-stretch 1
         bibtex-autokey-titleword-lenght 5
-        bibtex-completion-bibliography '("~/Archive/Files/Global/Bibliography.bib")
+        bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
         org-ref-insert-link-function 'org-ref-link-hydra/body
         org-ref-insert-cite-function 'org-ref-cite-insert-helm
         org-ref-insert-label-function 'org-ref-insert-label-link
@@ -490,6 +546,25 @@
 
 ;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
 ;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body)
+
+(use-package citar
+  :bind (("C-c b" . citar-insert-citation)
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset))
+  :custom
+  (org-cite-insert-processor 'citar)
+  (org-cite-follow-processor 'citar)
+  (org-cite-activate-processor 'citar)
+  (citar-bibliography org-cite-global-bibliography)
+  (citar-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")))
+
+(setq citar-symbols
+      `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
+        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))
+      citar-symbol-separator "  "
+      citar-filenotify-callback 'refresh-cache
+      citar-open-note-function 'orb-citar-edit-note)
 
 (use-package async)
 
@@ -509,8 +584,29 @@
 (global-set-key (kbd "M-x") #'helm-M-x)
 (global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
 (global-set-key (kbd "C-x C-f") #'helm-find-files)
+(global-set-key (kbd "C-c h") #'helm-command-prefix)
+
+(use-package helm-bibtex)
+
+(setq bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
+      bibtex-completion-library-path '("~/Library")
+      bibtex-completion-pdf-field "file"
+      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Files/Globals/Bib-Notes/"
+      bibtex-completion-additional-search-fields '(keywords)
+      bibtex-completion-pdf-symbol "⌘"
+      bibtex-completion-notes-symbol "✎"
+      bibtex-completion-pdf-extension '(".pdf" ".djvu" ".jpg")) ;add extensions as needed.
+
+(require 'helm-config)
+
+(define-key helm-command-map "b" 'helm-bibtex)
+(define-key helm-command-map "B" 'helm-bibtex-with-local-bibliography)
+(define-key helm-command-map "n" 'helm-bibtex-with-notes)
+(define-key helm-command-map (kbd "<menu>") 'helm-resume)
 
 (use-package swiper-helm)
+(global-set-key (kbd "C-s") 'swiper-helm-from-isearch)
+(global-set-key (kbd "C-M-s") 'helm-regexp)
 
 (use-package company
   :bind (("C-c ." . company-complete)))
