@@ -28,61 +28,21 @@
 (setq straight-use-package-by-default t) ;Adds the straight argument to all use-package statements.
 (setq use-package-always-ensure t) ;Adds the require argument to all use-package statements.
 
-(scroll-bar-mode -1) ;Removes scrollbars from UI.
-(tool-bar-mode -1) ;Removes toolbar from UI.
-(set-fringe-mode 5) ;Adds spacing from edge of frame.
-(menu-bar-mode -1) ;Removes menue bar from UI.
-(column-number-mode 1) ;Adds column number to minibuffer.
-(show-paren-mode t) ;Highlight paren currently under point.
-(global-display-line-numbers-mode t) ;Adds line numbers to buffers by default.
-(global-visual-line-mode t) ;Enables visual line wrapping in buffers.
-(setq-default fill-column 80) ; Visual line wrap after 80 characters.
-(setq inhibit-startup-message t) ; Disables default landing screen, scratch buffer used instead.
-(setq visible-bell t    ; Enables visual alert bell.
-      ring-bell-function 'ignore) ; Disable sound bell.
-
-(dolist (mode '(pdf-view-mode-hook
-                term-mode-hook
-                shell-mode-hook
-                eww-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
-
-(dolist (mode '(term-mode-hook
-                shell-mode-hook
-                eww-mode-hook
-                eshell-mode-hook))
-  (add-hook mode (lambda () (company-mode 0))))
-
-(setq-default initial-scratch-message nil)
-
 (setq display-time-day-and-date t
       display-time-24hr-format t
-      display-time-format "%Y-%m-%d %H:%M")
+      display-time-format "%Y-%m-%d %H:%M"
+      column-number-mode 1) ;Adds column number to minibuffer.
 
-(display-time-mode 1)
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
 
-(global-auto-revert-mode 1)
-
-(fset 'yes-or-no-p 'y-or-n-p)
-
-(setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow))
-
-(global-hl-line-mode 1)
-
-(setq vc-follow-symlinks t) ;Follows symlinks with out prompting user.
-
-(setq initial-buffer-choice "~/Neuromancer/Grimoire/Files/Globals/Splash.org")
-
-(setq-default indentd-tabs-mode nil)
-
-(setq calendar-latitude 42.33
-      calendar-longitude -83.04
-      calendar-location-name "Detroit,MI"
-      user-full-name "Que Fanning"
-      user-real-login-name "Que Fanning"
-      user-login-name "Que"
-      user-mail-address "Que@ironshark.org")
+(menu-bar-mode -1) ; Removes menue bar from UI.
+(tool-bar-mode -1) ; Removes toolbar from UI.
+(scroll-bar-mode -1) ; Removes scrollbars from UI.
+(set-fringe-mode 5) ; Adds spacing from edge of frame.
+(global-hl-line-mode 1) ; Highlights line currently under point.
+(setq org-startup-with-inline-images t) ; Displays org-mode image previews.
 
 ;(custom-set-variables
 ; '(initial-frame-alist (quote ((fullscreen . maximized)))))
@@ -105,74 +65,13 @@
                     :weight 'light
                     :height 220)
 
-
-
 (prefer-coding-system 'utf-8)
 (when (display-graphic-p)
   (setq x-select-request-type '(UTF8_STRING COMPOUND_TEXT TEXT STRING)))
 
-(add-hook 'before-save-hook #'whitespace-cleanup)
-(setq-default sentence-end-double-space nil)
-
-(setq custom-file "~/Voyager-Config/emacs.d/custom.el")
-(load custom-file)
-
-(setq backup-directory-alist '(("." . "~/Neuromancer/Archive/Files/Emacs-Bak"))
-      backup-by-copying t
-      version-control t
-      vc-make-backup-files t
-      kept-old-versions 5
-      kept-new-versions 20
-      delete-old-versions t
-      history-length t
-      history-delete-duplicates t
-      savehist-save-minibuffer-history 1
-      savehist-additional-variables
-        '(kill-ring
-             search-ring
-             regexp-search-ring))
-
-
-(setq tramp-backup-directory-alist backup-directory-alist
-      auto-save-file-name-transforms '((".*" "~/Neuromancer/Archive/Files/Emacs-Bak/Auto-Saves" t))
-      savehist-file "~/Neuromancer/Archive/Files/Emacs-Bak/Save-hist")
-
-(savehist-mode 1)
-
-(setq history-delete-duplicates t
-      history-length            100 ; default is 30.
-      report-emacs-bug-no-explanations t
-      comint-prompt-read-only          t
-      uniquify-buffer-name-style       nil
-      register-preview-delay           nil
-      message-log-max                  1000
-      kill-ring-max                    100
-      mark-ring-max                    100
-      global-mark-ring-max             200)
-
-(setq org-startup-with-inline-images t)
-
 (use-package all-the-icons)
 
-(use-package doom-themes
-  :init (load-theme 'doom-city-lights t))
-
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
-
-(use-package rainbow-delimiters
-  :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
-
 (use-package emojify)
-
-(dolist (hook '(text-mode-hook))
-  (add-hook hook (lambda ()
-                  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
-                   (flyspell-mode 1))))
-
-(use-package undo-tree)
-(global-undo-tree-mode 1)
 
 (use-package ligature
   :straight (ligature :type git :host github :repo "mickeynp/ligature.el")
@@ -200,6 +99,90 @@
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
 
+(use-package doom-themes
+  :init (load-theme 'doom-city-lights t))
+
+(global-display-line-numbers-mode t) ;Adds line numbers to buffers by default.
+
+;;; Disables line numbers in listed modes
+(dolist (mode '(pdf-view-mode-hook
+                term-mode-hook
+                shell-mode-hook
+                eww-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+(setq-default initial-scratch-message nil) ; Removes default message from scratch buffer.
+(setq inhibit-startup-message t ; Disables default landing screen, scratch buffer used instead.
+      initial-buffer-choice "~/Neuromancer/splash.org") ; Creates custom landing buffer.
+
+(setq calendar-latitude 42.33
+      calendar-longitude -83.04
+      calendar-location-name "Detroit,MI"
+      user-full-name "Que Fanning"
+      user-real-login-name "Que Fanning"
+      user-login-name "Que"
+      user-mail-address "Que@ironshark.org")
+
+;;; Local File Versioning
+(setq backup-directory-alist '(("." . "~/Neuromancer/Archive/Files/Emacs-Bak"))
+      backup-by-copying t
+      version-control t
+      vc-make-backup-files t
+      kept-old-versions 5
+      kept-new-versions 20
+      delete-old-versions t
+      history-length t
+      history-delete-duplicates t
+      savehist-save-minibuffer-history 1
+      savehist-additional-variables
+        '(kill-ring
+             search-ring
+             regexp-search-ring))
+
+
+(setq tramp-backup-directory-alist backup-directory-alist
+      auto-save-file-name-transforms '((".*" "~/Neuromancer/Archive/Files/Emacs-Bak/Auto-Saves" t))
+      savehist-file "~/Neuromancer/Archive/Files/Emacs-Bak/Save-hist")
+
+(savehist-mode 1)
+
+;;; Custom File Declaration
+(setq custom-file "~/Voyager-Config/emacs.d/custom.el")
+(load custom-file)
+
+;;; History and Message Buffer Tracking
+(setq history-delete-duplicates t
+      history-length            100 ; default is 30.
+      report-emacs-bug-no-explanations t
+      comint-prompt-read-only          t
+      uniquify-buffer-name-style       nil
+      register-preview-delay           nil
+      message-log-max                  1000
+      kill-ring-max                    100
+      mark-ring-max                    100
+      global-mark-ring-max             200)
+
+(global-visual-line-mode t) ;Enables visual line wrapping in buffers.
+(setq-default fill-column 80) ; Visual line wrap after 80 characters.
+(setq visual-line-fringe-indicators '(left-curly-arrow right-curly-arrow)) ;adds visual line wrap indicator.
+
+;;; Remove trailing white space
+(add-hook 'before-save-hook #'whitespace-cleanup)
+(setq-default sentence-end-double-space nil)
+
+;;; Automatically updates buffer if file chages on disk.
+(global-auto-revert-mode 1)
+
+;;; Changes yes or no mini-buffer prompts to y or n.
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;;; Follow Symlinks without prompting user.
+(setq vc-follow-symlinks t)
+
+(setq visible-bell t    ; Enables visual alert bell.
+      ring-bell-function 'ignore) ; Disable sound bell.
+
 (use-package helpful
   :commands (helpful-callable helpful-variable helpful-command helpful-key)
   :bind
@@ -216,11 +199,6 @@
 (global-set-key (kbd "C-S-v") 'clipboard-yank)
 (global-set-key (kbd "C-S-c") 'clipboard-kill-ring-save)
 
-;(defun revert-buffer-no-confirm ()
-;  (interactive) (revert-buffer t t))
-
-;(define-key global-map (kbd "C-u u b") 'revert-buffer-no-confirm)
-
 (use-package evil
   :init
   (setq evil-want-integration t
@@ -234,24 +212,10 @@
   (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
   (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join))
 
-(define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-(define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
-;; Use visual line motions outside of visual-line-mode buffers
-(evil-global-set-key 'motion "j" 'evil-next-visual-line)
-(evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-
-;; Sets the starting EVIL state for certain modes.
-(evil-set-initial-state 'messages-buffer-mode 'normal)
-(evil-set-initial-state 'dashboard-mode 'normal)
-
 (use-package evil-collection)
 
-(dolist (mode '(custom-mode
-                   eshell-mode
-                   git-rebase-mode
-                   term-mode))
-  (add-to-list 'evil-emacs-state-modes mode))
+(use-package undo-tree)
+(global-undo-tree-mode 1)
 
 (use-package general
   :after evil
@@ -266,6 +230,65 @@
 
 (use-package hydra)
 
+;;; Highlight paren currently under point.
+(show-paren-mode t)
+
+(use-package rainbow-delimiters
+  :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
+
+(use-package helm
+  :config
+  (require 'helm-config)
+  (helm-mode 1))
+
+;;; Helm Keybindings
+(global-set-key (kbd "M-x") #'helm-M-x)
+(global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
+(global-set-key (kbd "C-x C-f") #'helm-find-files)
+(global-set-key (kbd "C-c h") #'helm-command-prefix)
+
+(use-package swiper-helm)
+(global-set-key (kbd "C-s") 'swiper-helm-from-isearch)
+(global-set-key (kbd "C-M-s") 'helm-regexp)
+
+(use-package company
+  :bind (("C-c ." . company-complete)))
+
+(setq company-tooltip-limit 10
+      company-show-numbers t
+      company-idle-delay 0.3
+      company-echo-delay 0)
+
+;;; Disable Company Mode in listed modes.
+(dolist (mode '(term-mode-hook
+                shell-mode-hook
+                eww-mode-hook
+                eshell-mode-hook))
+  (add-hook mode (lambda () (company-mode 0))))
+
+(use-package company-fuzzy
+  :hook (company-mode . company-fuzzy-mode))
+
+(global-company-fuzzy-mode 1)
+
+(dolist (hook '(text-mode-hook))
+  (add-hook hook (lambda ()
+                  ; (setq ispell-program-name "~/.guix-profile/bin/hunspell")
+                   (flyspell-mode 1))))
+
+(defun technonomicon/org-mode-visual-fill ()
+  (setq visual-fill-column-width 100
+               visual-fill-column-center-text t)
+  (visual-fill-column-mode 1))
+
+(use-package visual-fill-column
+  :hook (org-mode . technonomicon/org-mode-visual-fill))
+
+(use-package org-bullets
+  :hook (org-mode . org-bullets-mode)
+  :custom
+  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
 (defun technonomicon/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
@@ -277,6 +300,7 @@
              org-edit-src-content-indentation 0))
 
 (defun technonomicon/org-font-setup ()
+
 
 (font-lock-add-keywords 'org-mode
                         '(("^*\\([-])\\) "
@@ -290,7 +314,7 @@
                       (org-level-6 . 1.1)
                       (org-level-7 . 1.1)
                       (org-level-8 . 1.1)))
-  (set-face-attribute (car face) nil :font "Overpass" :weight 'regular :height (cdr face)))
+  (set-face-attribute (car face) nil :font "Fira Sans" :weight 'regular :height (cdr face)))
 
 (set-face-attribute 'org-block nil    :foreground nil :inherit 'fixed-pitch)
 (set-face-attribute 'org-table nil    :inherit 'fixed-pitch)
@@ -305,73 +329,38 @@
 (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
 (use-package org
-
-:hook (org-mode . technonomicon/org-mode-setup)
-      (org-mode . technonomicon/org-font-setup)
-
-:config
-(setq org-ellipsis " ▾"
-      org-hide-emphasis-markers t
-      org-src-fontify-natively t
-      org-fontify-quote-and-verse-blocks t
-      org-src-tab-acts-natively t
-      org-edit-src-content-indentation 2
-      org-hide-block-startup nil
-      org-src-preserve-indentation nil
-      org-startup-folded 'content
-      org-cycle-separator-lines 2
-      org-confirm-babel-evaluate nil
-      org-capture-bookmark nil)
-
+  :hook (org-mode . technonomicon/org-mode-setup)
+        (org-mode . technonomicon/org-font-setup)
+  :config
+  (setq org-ellipsis " ▾"
+        org-hide-emphasis-markers t
+        org-src-fontify-natively t
+        org-fontify-quote-and-verse-blocks t
+        org-src-tab-acts-natively t
+        org-edit-src-content-indentation 2
+        org-hide-block-startup nil
+        org-src-preserve-indentation nil
+        org-startup-folded 'content
+        org-cycle-separator-lines 2
+        org-confirm-babel-evaluate nil
+        org-capture-bookmark nil)
 (evil-define-key '(normal insert visual) org-mode-map (kbd "C-j") 'org-next-visible-heading)
 (evil-define-key '(normal insert visual) org-mode-map (kbd "C-k") 'org-previous-visible-heading)
 
 (evil-define-key '(normal insert visual) org-mode-map (kbd "M-j") 'org-metadown)
 (evil-define-key '(normal insert visual) org-mode-map (kbd "M-k") 'org-metaup)
-
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((emacs-lisp . t)
    (lisp . t)
    (latex . t)
    (scheme . t)))
+;;; add (ledger .t) once leger cli is installed.
 
 (push '("conf-unix" . conf-unix) org-src-lang-modes))
 
-(setq org-directory "~/Neuromancer/Grimoire/Org"
-      org-agenda-files '("~/Neuromancer"
-                              "~/Projects"))
-
-;; (define-key org-mode-map (kbd "C-c i c") 'completion-at-point)
-;; (define-key org-mode-map (kbd "C-c i r") 'org-ref-insert-link)
-;; (define-key org-mode-map (kbd "C-c i l") 'org-insert-link)
-;; (define-key org-mode-map (kbd "C-c i t") 'org-transclusion-add)
-
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
-
-(setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
-                                          ("file" "Link to source file" ":")
-                                          ("Summary" "Summary of source" ""))
-      bibtex-align-at-equal-sign t
-      bibtex-dialect 'biblatex)
-
-(use-package org-bullets
-  :hook (org-mode . org-bullets-mode)
-  :custom
-  (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
-
-(use-package org-transclusion
-  :after org)
-(define-key global-map (kbd "<f12>") #'org-transclusion-add)
-
-(defun technonomicon/org-mode-visual-fill ()
-  (setq visual-fill-column-width 100
-               visual-fill-column-center-text t)
-  (visual-fill-column-mode 1))
-
-(use-package visual-fill-column
-  :hook (org-mode . technonomicon/org-mode-visual-fill))
 
 (use-package tex
   :straight auctex)
@@ -381,53 +370,82 @@
 
 (use-package latex-preview-pane)
 
-(use-package org-pdfview
-  :config
-  (add-to-list 'org-file-apps
-               '("\\.pdf\\'" . (lambda (file link)
-                                 (org-pdfview-open-link)))))
+(setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
+                                    ("file" "Link to source file" ":")
+                                    ("Summary" "Summary of source" ""))
+      bibtex-align-at-equal-sign t
+      bibtex-dialect 'biblatex
+      bibtex-maintain-sorted-entries t
+      bibtex-autokey-edit-before-use t
+      bibtex-autokey-before-presentation-hook t
+      bibtex-autokey-year-length 4
+      bibtex-autokey-name-year-separator "-"
+      bibtex-autokey-year-title-separator "-"
+      bibtex-autokey-titleword-separator "-"
+      bibtex-autokey-titlewords 2
+      bibtex-autokey-titlewords-stretch 1
+      bibtex-autokey-titleword-lenght 5
+      bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
 
-(use-package pdf-tools
-  :defer t
-  :pin manual
-  :config
-  (pdf-tools-install)
-  (setq-default pdf-view-display-size 'fit-width)
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+(use-package helm-bibtex)
 
-:bind (:map pdf-view-mode-map
-              ("s" . pdf-occur)
-              ("g" . pdf-view-first-page)
-              ("G" . pdf-view-last-page)
-              ("j" . pdf-view-next-page)
-              ("k" . pdf-view-previous-page)
-              ("e" . pdf-view-goto-page)
-              ("u" . pdf-view-revert-buffer)
-              ("y" . pdf-view-kill-ring-save)
-              ("m" . pdf-misc-display-metadata)
-              ("b" . pdf-view-set-slice-from-bounding-box)
-              ("r" . pdf-view-reset-slice)
-              ("ad" . pdf-annot-delete)
-              ("aa" . pdf-annot-attachment-dired)
-              ("<s-spc>" . pdf-view-scroll-down-or-next-page))
-:custom
-(pdf-annot-activate-created-annotations t "automatically annotate highlights")
-(pdf-view-active-region nil))
+(setq bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
+      bibtex-completion-library-path '("~/Library")
+      bibtex-completion-pdf-field "file"
+      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Nodes/references"
+      bibtex-completion-additional-search-fields '(keywords)
+      bibtex-completion-pdf-symbol "⌘"
+      bibtex-completion-notes-symbol "✎"
+      bibtex-completion-pdf-extension '(".pdf" ".djvu" ".jpg")) ;add extensions as needed.
 
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
-      TeX-source-correlate-start-server t)
+(require 'helm-config)
 
-(add-hook 'TeX-after-compilation-finished-functions
-          #'TeX-revert-document-buffer)
+(define-key helm-command-map "b" 'helm-bibtex)
+(define-key helm-command-map "B" 'helm-bibtex-with-local-bibliography)
+(define-key helm-command-map "n" 'helm-bibtex-with-notes)
+(define-key helm-command-map (kbd "<menu>") 'helm-resume)
 
-(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+(use-package org-roam-bibtex
+  :after org-roam)
 
-(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+(setq orb-preformat-keywords '("citekey" "author" "date"))
 
-(use-package ox-haunt)
-(with-eval-after-load 'ox
-  (require 'ox-haunt))
+;; (use-package org-ref
+;;   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
+;;   :init
+;;   (require 'bibtex) ; Requires bibtex org sub-module
+;;   (require 'org-ref-helm) ; Requires the helm sub-module of Org-ref
+;;   (setq bibtex-autokey-year-length 4
+;;         bibtex-autokey-name-year-separator "-"
+;;         bibtex-autokey-year-title-separator "-"
+;;         bibtex-autokey-titleword-separator "-"
+;;         bibtex-autokey-titlewords 2
+;;         bibtex-autokey-titlewords-stretch 1
+;;         bibtex-autokey-titleword-lenght 5
+;;         bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
+;;         org-ref-insert-link-function 'org-ref-link-hydra/body
+;;         org-ref-insert-cite-function 'org-ref-cite-insert-helm
+;;         org-ref-insert-label-function 'org-ref-insert-label-link
+;;         org-ref-insert-ref-function 'org-ref-insert-ref-link))
+
+(use-package citar
+  :bind (("C-c b" . citar-insert-citation)
+         :map minibuffer-local-map
+         ("M-b" . citar-insert-preset))
+  :custom
+  ;; (org-cite-insert-processor 'citar)
+  ;; (org-cite-follow-processor 'citar)
+  ;; (org-cite-activate-processor 'citar)
+  ;; (citar-bibliography org-cite-global-bibliography)
+  (citar-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")))
+
+(setq ;; citar-symbols
+      ;; `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
+      ;;   (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
+      ;;   (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))
+      citar-symbol-separator "  "
+      citar-filenotify-callback 'refresh-cache
+      citar-open-note-function 'orb-citar-edit-note)
 
 (use-package org-roam
   :init
@@ -493,12 +511,8 @@
 
 (setq org-roam-node-dispaly-template (concat "${title:*} " (propertize "${tags:10" 'face 'org-tag)))
 
+;;; Set sub-dirctory for Roam Journal entries
 (setq org-roam-dailies-directory "Journal")
-
-(use-package org-roam-bibtex
-  :after org-roam)
-
-(setq orb-preformat-keywords '("citekey" "author" "date"))
 
 (use-package org-fc
   :straight
@@ -526,45 +540,56 @@
   (kbd "s") 'org-fc-review-rate-suspend-card
   (kbd "q") 'org-fc-review-quit)
 
-(use-package org-ref
-  :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
-  :init
-  (require 'bibtex) ; Requires bibtex org sub-module
-  (require 'org-ref-helm) ; Requires the helm sub-module of Org-ref
-  (setq bibtex-autokey-year-length 4
-        bibtex-autokey-name-year-separator "-"
-        bibtex-autokey-year-title-separator "-"
-        bibtex-autokey-titleword-separator "-"
-        bibtex-autokey-titlewords 2
-        bibtex-autokey-titlewords-stretch 1
-        bibtex-autokey-titleword-lenght 5
-        bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
-        org-ref-insert-link-function 'org-ref-link-hydra/body
-        org-ref-insert-cite-function 'org-ref-cite-insert-helm
-        org-ref-insert-label-function 'org-ref-insert-label-link
-        org-ref-insert-ref-function 'org-ref-insert-ref-link))
+(use-package org-transclusion
+  :after org)
+(define-key global-map (kbd "<f12>") #'org-transclusion-add)
 
-;; (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-;; (define-key org-mode-map (kbd "s-]") 'org-ref-insert-link-hydra/body)
+(use-package org-pdfview
+  :config
+  (add-to-list 'org-file-apps
+               '("\\.pdf\\'" . (lambda (file link)
+                                 (org-pdfview-open-link)))))
 
-(use-package citar
-  :bind (("C-c b" . citar-insert-citation)
-         :map minibuffer-local-map
-         ("M-b" . citar-insert-preset))
-  :custom
-  (org-cite-insert-processor 'citar)
-  (org-cite-follow-processor 'citar)
-  (org-cite-activate-processor 'citar)
-  (citar-bibliography org-cite-global-bibliography)
-  (citar-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")))
+(use-package pdf-tools
+  :defer t
+  :pin manual
+  :config
+  (pdf-tools-install)
+  (setq-default pdf-view-display-size 'fit-width)
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward)
+:bind (:map pdf-view-mode-map
+              ("s" . pdf-occur)
+              ("g" . pdf-view-first-page)
+              ("G" . pdf-view-last-page)
+              ("j" . pdf-view-next-page)
+              ("k" . pdf-view-previous-page)
+              ("e" . pdf-view-goto-page)
+              ("u" . pdf-view-revert-buffer)
+              ("y" . pdf-view-kill-ring-save)
+              ("m" . pdf-misc-display-metadata)
+              ("b" . pdf-view-set-slice-from-bounding-box)
+              ("r" . pdf-view-reset-slice)
+              ("ad" . pdf-annot-delete)
+              ("aa" . pdf-annot-attachment-dired)
+              ("<s-spc>" . pdf-view-scroll-down-or-next-page))
+:custom
+(pdf-annot-activate-created-annotations t "automatically annotate highlights")
+(pdf-view-active-region nil))
 
-(setq citar-symbols
-      `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-        (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-        (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))
-      citar-symbol-separator "  "
-      citar-filenotify-callback 'refresh-cache
-      citar-open-note-function 'orb-citar-edit-note)
+(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
+      TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+      TeX-source-correlate-start-server t)
+
+(add-hook 'TeX-after-compilation-finished-functions
+          #'TeX-revert-document-buffer)
+
+(add-hook 'pdf-view-mode-hook (lambda() (linum-mode -1)))
+
+(add-hook 'pdf-tools-enabled-hook 'pdf-view-midnight-minor-mode)
+
+(use-package ox-haunt)
+(with-eval-after-load 'ox
+  (require 'ox-haunt))
 
 (use-package async)
 
@@ -575,52 +600,3 @@
   (with-eval-after-load 'dired (dired-async-mode)))
 
 (dired-async-mode 1)
-
-(use-package helm
-  :config
-  (require 'helm-config)
-  (helm-mode 1))
-
-(global-set-key (kbd "M-x") #'helm-M-x)
-(global-set-key (kbd "C-x r b") #'helm-filtered-bookmarks)
-(global-set-key (kbd "C-x C-f") #'helm-find-files)
-(global-set-key (kbd "C-c h") #'helm-command-prefix)
-
-(use-package helm-bibtex)
-
-(setq bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
-      bibtex-completion-library-path '("~/Library")
-      bibtex-completion-pdf-field "file"
-      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Files/Globals/Bib-Notes/"
-      bibtex-completion-additional-search-fields '(keywords)
-      bibtex-completion-pdf-symbol "⌘"
-      bibtex-completion-notes-symbol "✎"
-      bibtex-completion-pdf-extension '(".pdf" ".djvu" ".jpg")) ;add extensions as needed.
-
-(require 'helm-config)
-
-(define-key helm-command-map "b" 'helm-bibtex)
-(define-key helm-command-map "B" 'helm-bibtex-with-local-bibliography)
-(define-key helm-command-map "n" 'helm-bibtex-with-notes)
-(define-key helm-command-map (kbd "<menu>") 'helm-resume)
-
-(use-package swiper-helm)
-(global-set-key (kbd "C-s") 'swiper-helm-from-isearch)
-(global-set-key (kbd "C-M-s") 'helm-regexp)
-
-(use-package company
-  :bind (("C-c ." . company-complete)))
-
-(setq company-tooltip-limit 10
-      company-show-numbers t
-      company-idle-delay 0.3
-      company-echo-delay 0)
-
-
-
-(add-hook 'after-init-hook 'global-company-mode)
-
-(use-package company-fuzzy
-  :hook (company-mode . company-fuzzy-mode))
-
-(global-company-fuzzy-mode 1)
