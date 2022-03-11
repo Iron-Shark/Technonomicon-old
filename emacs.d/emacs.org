@@ -3,13 +3,18 @@
 #+Title Emacs Literate Configuration
 
 * Package Management
-*** Disable Package.el
+** Warning Message
+#+begin_src emacs-lisp
+;;;; This file is generated automatically from emacs.org, make any changes there.
+#+end_src
+
+** Disable Package.el
 Disables the default Emacs package manager.
 #+begin_src emacs-lisp
 (setq package-enable-at-startup nil)
 #+end_src
 
-*** Straight.el
+** Straight.el
 Checks if Straight.el is present if it is not found install it from Github.
 
 #+begin_src emacs-lisp
@@ -29,7 +34,7 @@ Checks if Straight.el is present if it is not found install it from Github.
 (setq straight-repository-branch "develop")
 #+end_src
 
-*** Use-package
+** Use-package
 Configures use-package installation macro
 #+begin_src emacs-lisp
   (straight-use-package
@@ -55,8 +60,10 @@ Configures use-package installation macro
 #+begin_src emacs-lisp
 (setq display-time-day-and-date t
       display-time-24hr-format t
-      display-time-format "%Y-%m-%d %H:%M"
-      column-number-mode 1) ;Adds column number to minibuffer.
+      display-time-format "%Y-%m-%d %H:%M")
+
+(display-time-mode 1)
+(column-number-mode 1) ; Adds column number to modeline
 #+end_src
 **** Doom Modeline
 Adds the Doom Emacs Style Modeline.
@@ -361,7 +368,7 @@ Adds a set of progressive colors to each pair of parentheses, and adds highlight
   :init (add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+end_src
 
-** Completion and Checking
+** Completion and Comparison
 
 *** Helm
 
@@ -383,7 +390,7 @@ Adds a set of progressive colors to each pair of parentheses, and adds highlight
 Replaces normal I-search with Swiper.
 #+begin_src emacs-lisp
 (use-package swiper-helm)
-(global-set-key (kbd "C-s") 'swiper-helm-from-isearch)
+(global-set-key (kbd "C-s") 'swiper-helm)
 (global-set-key (kbd "C-M-s") 'helm-regexp)
 #+end_src
 
@@ -452,14 +459,14 @@ Allows fuzzy matching with company.
 ***** Indentations and Autofill
 #+begin_src emacs-lisp
 (defun technonomicon/org-mode-setup ()
-  (org-indent-mode)
+  (org-indent-mode 1)
   (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (display-line-numbers-mode 0)
   (setq evil-auto-indent nil
-             org-src-preserve-indentation nil
-             org-edit-src-content-indentation 0))
+        org-src-preserve-indentation nil
+        org-edit-src-content-indentation 0))
 #+end_src
 
 ***** Fonts
@@ -546,7 +553,6 @@ Creates templates for SRC block tab expansion.
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 #+end_src
 
-
 *** LaTeX
 
 **** LaTeX Engine
@@ -561,6 +567,15 @@ Creates templates for SRC block tab expansion.
 **** LaTeX Preview Pane
 #+begin_src emacs-lisp
 (use-package latex-preview-pane)
+#+end_src
+
+*** LISP
+
+**** SLIME
+#+begin_src emacs-lisp
+(use-package slime)
+
+(setq inferior-lisp-program "sbcl")
 #+end_src
 
 * Knowledge Management
@@ -585,6 +600,13 @@ Creates templates for SRC block tab expansion.
       bibtex-autokey-titlewords-stretch 1
       bibtex-autokey-titleword-lenght 5
       bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
+
+(defun bibtex-global-view ()
+"Opens global bibliography file"
+  (interactive)
+  (find-file "~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
+
+(define-key org-mode-map (kbd "C-c B") #'bibtex-global-view)
 #+end_src
 
 *** Helm Bibtex
@@ -617,69 +639,37 @@ Creates templates for SRC block tab expansion.
 #+end_src
 *** Org Ref
 #+begin_src emacs-lisp
-;; (use-package org-ref
-;;   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
-;;   :init
-;;   (require 'bibtex) ; Requires bibtex org sub-module
-;;   (require 'org-ref-helm) ; Requires the helm sub-module of Org-ref
-;;   (setq bibtex-autokey-year-length 4
-;;         bibtex-autokey-name-year-separator "-"
-;;         bibtex-autokey-year-title-separator "-"
-;;         bibtex-autokey-titleword-separator "-"
-;;         bibtex-autokey-titlewords 2
-;;         bibtex-autokey-titlewords-stretch 1
-;;         bibtex-autokey-titleword-lenght 5
-;;         bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
-;;         org-ref-insert-link-function 'org-ref-link-hydra/body
-;;         org-ref-insert-cite-function 'org-ref-cite-insert-helm
-;;         org-ref-insert-label-function 'org-ref-insert-label-link
-;;         org-ref-insert-ref-function 'org-ref-insert-ref-link))
+(use-package org-ref
+  :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
+  :init
+  (require 'bibtex) ; Requires bibtex org sub-module
+  (setq bibtex-autokey-year-length 4
+        bibtex-autokey-name-year-separator "-"
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator "-"
+        bibtex-autokey-titlewords 2
+        bibtex-autokey-titlewords-stretch 1
+        bibtex-autokey-titleword-lenght 5
+        bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
+  (require 'org-ref-helm)
+  (setq org-ref-insert-link-function 'org-ref-link-hydra/body
+        org-ref-insert-cite-function 'org-ref-cite-insert-helm
+        org-ref-insert-label-function 'org-ref-insert-label-link
+        org-ref-insert-ref-function 'org-ref-insert-ref-link
+           org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))))
+
+(define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link-hydra/body)
 #+end_src
 
-*** Citar
-#+begin_src emacs-lisp
-(use-package citar
-  :bind (("C-c b" . citar-insert-citation)
-         :map minibuffer-local-map
-         ("M-b" . citar-insert-preset))
-  :custom
-  ;; (org-cite-insert-processor 'citar)
-  ;; (org-cite-follow-processor 'citar)
-  ;; (org-cite-activate-processor 'citar)
-  ;; (citar-bibliography org-cite-global-bibliography)
-  (citar-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")))
-
-(setq ;; citar-symbols
-      ;; `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-      ;;   (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-      ;;   (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))
-      citar-symbol-separator "  "
-      citar-filenotify-callback 'refresh-cache
-      citar-open-note-function 'orb-citar-edit-note)
-#+end_src
 ** Files Management
 
 *** Org Roam
+**** General
 #+begin_src emacs-lisp
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
-  (require 'org-roam-protocol)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; ("C-c n a a" . org-roam-alias-add)
-         ;; ("C-c n a A" . org-roam-alias-remove)
-         ;; ("C-c n a t" . org-roam-tag-add)
-         ;; ("C-c n a T" . org-roam-tag-remove)
-         ;; ("C-c n a r" . org-roam-ref-add)
-         ;; ("C-c n a R" . org-roam-ref-remove)
-         ("C-c n j" . org-roam-dailies-capture-today))
-  ;; :map org-mode-map
-  ;; ("C-c i c" . completion-at-point)
-  ;; ("C-c i p" . org-insert-link)
+  ;; (require 'org-roam-protocol)
   :custom
         (org-roam-db-update-on-save t) ; May need to be disable for performance
         (org-roam-completion-everywhere t)
@@ -715,7 +705,10 @@ Creates templates for SRC block tab expansion.
   :config
        (org-roam-db-autosync-mode)
        (org-roam-setup))
+#+end_src
 
+**** Display Format
+#+begin_src emacs-lisp
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
                (display-buffer-in-direction)
@@ -727,6 +720,149 @@ Creates templates for SRC block tab expansion.
 
 ;;; Set sub-dirctory for Roam Journal entries
 (setq org-roam-dailies-directory "Journal")
+#+end_src
+
+**** Roam Key Maps
+
+***** General
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c n") org-roam-mode-map)
+
+(defvar org-roam-mode-map (make-sparse-keymap)
+  "Prefix key for all Roam actions.")
+
+
+(define-key org-roam-mode-map (kbd "b") 'org-roam-buffer-toggle)
+(define-key org-roam-mode-map (kbd "g") 'org-roam-graph)
+(define-key org-roam-mode-map (kbd "i") 'org-roam-node-insert)
+(define-key org-roam-mode-map (kbd "c") 'org-roam-capture)
+#+end_src
+
+***** Meta-Data
+#+begin_src emacs-lisp
+(defvar org-roam-meta-data-map (make-sparse-keymap)
+  "Prefix key for adding or removing Roam Meta-data.")
+(define-key org-roam-mode-map (kbd "a") org-roam-meta-data-map)
+
+(define-key org-roam-meta-data-map (kbd "a") 'org-roam-alias-add)
+(define-key org-roam-meta-data-map (kbd "A") 'org-roam-alias-remove)
+(define-key org-roam-meta-data-map (kbd "t") 'org-roam-tag-add)
+(define-key org-roam-meta-data-map (kbd "T") 'org-roam-tag-remove)
+(define-key org-roam-meta-data-map (kbd "r") 'org-roam-ref-add)
+(define-key org-roam-meta-data-map (kbd "R") 'org-roam-ref-remove)
+#+end_src
+
+***** Search
+#+begin_src emacs-lisp
+(defvar org-roam-search-map (make-sparse-keymap)
+  "Prefix key for searching based on tags.")
+(define-key org-roam-mode-map (kbd "f") org-roam-search-map)
+
+(define-key org-roam-search-map (kbd "n") 'org-roam-node-find)
+
+(define-key org-roam-search-map (kbd "c") 'find-core-tag)
+(define-key org-roam-search-map (kbd "l") 'find-litterature-tag)
+(define-key org-roam-search-map (kbd "r") 'find-reference-tag)
+(define-key org-roam-search-map (kbd "n") 'find-noun-tag)
+(define-key org-roam-search-map (kbd "i") 'find-index-tag)
+(define-key org-roam-search-map (kbd "v") 'find-void-tag)
+(define-key org-roam-search-map (kbd "f") 'find-file-tag)
+#+end_src
+
+****** Custom Search Functions
+
+******* Core
+#+begin_src emacs-lisp
+(defun core-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "core" tags)))
+
+(defun find-core-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'core-search))
+#+end_src
+
+******* Litterature
+#+begin_src emacs-lisp
+(defun litterature-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "lit" tags)))
+
+(defun find-litterature-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'litterature-search))
+#+end_src
+
+******* Reference
+#+begin_src emacs-lisp
+(defun reference-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "ref" tags)))
+
+(defun find-reference-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'reference-search))
+#+end_src
+
+******* Person/Place/Thing
+#+begin_src emacs-lisp
+(defun noun-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "noun" tags)))
+
+(defun find-noun-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'noun-search))
+#+end_src
+
+******* Index
+#+begin_src emacs-lisp
+(defun index-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "index" tags)))
+
+(defun find-index-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'index-search))
+#+end_src
+
+******* Void
+#+begin_src emacs-lisp
+(defun void-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "void" tags)))
+
+(defun find-void-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'void-search))
+#+end_src
+
+******* File
+#+begin_src emacs-lisp
+(defun file-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "file" tags)))
+
+(defun find-file-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'file-search))
+#+end_src
+
+***** Journal
+#+begin_src emacs-lisp
+(defvar org-roam-journal-map (make-sparse-keymap)
+  "Prefix key for Roam journal actions.")
+(define-key org-roam-mode-map (kbd "j") org-roam-journal-map)
+
+
+(define-key org-roam-mode-map (kbd "j") 'org-roam-dailies-capture-today)
 #+end_src
 
 *** Org Flash Cards
@@ -762,7 +898,7 @@ Creates templates for SRC block tab expansion.
 #+begin_src emacs-lisp
 (use-package org-transclusion
   :after org)
-(define-key global-map (kbd "<f12>") #'org-transclusion-add)
+(define-key org-mode-map (kbd "<f12>") #'org-transclusion-add)
 #+end_src
 
 *** PDF Management

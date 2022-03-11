@@ -1,3 +1,5 @@
+;;;; This file is generated automatically from emacs.org, make any changes there.
+
 (setq package-enable-at-startup nil)
 
 (defvar bootstrap-version)
@@ -30,8 +32,10 @@
 
 (setq display-time-day-and-date t
       display-time-24hr-format t
-      display-time-format "%Y-%m-%d %H:%M"
-      column-number-mode 1) ;Adds column number to minibuffer.
+      display-time-format "%Y-%m-%d %H:%M")
+
+(display-time-mode 1)
+(column-number-mode 1) ; Adds column number to modeline
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -248,7 +252,7 @@
 (global-set-key (kbd "C-c h") #'helm-command-prefix)
 
 (use-package swiper-helm)
-(global-set-key (kbd "C-s") 'swiper-helm-from-isearch)
+(global-set-key (kbd "C-s") 'swiper-helm)
 (global-set-key (kbd "C-M-s") 'helm-regexp)
 
 (use-package company
@@ -290,14 +294,14 @@
   (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
 
 (defun technonomicon/org-mode-setup ()
-  (org-indent-mode)
+  (org-indent-mode 1)
   (variable-pitch-mode 1)
   (auto-fill-mode 0)
   (visual-line-mode 1)
   (display-line-numbers-mode 0)
   (setq evil-auto-indent nil
-             org-src-preserve-indentation nil
-             org-edit-src-content-indentation 0))
+        org-src-preserve-indentation nil
+        org-edit-src-content-indentation 0))
 
 (defun technonomicon/org-font-setup ()
 
@@ -370,6 +374,10 @@
 
 (use-package latex-preview-pane)
 
+(use-package slime)
+
+(setq inferior-lisp-program "sbcl")
+
 (setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
                                     ("file" "Link to source file" ":")
                                     ("Summary" "Summary of source" ""))
@@ -386,6 +394,13 @@
       bibtex-autokey-titlewords-stretch 1
       bibtex-autokey-titleword-lenght 5
       bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
+
+(defun bibtex-global-view ()
+"Opens global bibliography file"
+  (interactive)
+  (find-file "~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
+
+(define-key org-mode-map (kbd "C-c B") #'bibtex-global-view)
 
 (use-package helm-bibtex)
 
@@ -410,62 +425,31 @@
 
 (setq orb-preformat-keywords '("citekey" "author" "date"))
 
-;; (use-package org-ref
-;;   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
-;;   :init
-;;   (require 'bibtex) ; Requires bibtex org sub-module
-;;   (require 'org-ref-helm) ; Requires the helm sub-module of Org-ref
-;;   (setq bibtex-autokey-year-length 4
-;;         bibtex-autokey-name-year-separator "-"
-;;         bibtex-autokey-year-title-separator "-"
-;;         bibtex-autokey-titleword-separator "-"
-;;         bibtex-autokey-titlewords 2
-;;         bibtex-autokey-titlewords-stretch 1
-;;         bibtex-autokey-titleword-lenght 5
-;;         bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
-;;         org-ref-insert-link-function 'org-ref-link-hydra/body
-;;         org-ref-insert-cite-function 'org-ref-cite-insert-helm
-;;         org-ref-insert-label-function 'org-ref-insert-label-link
-;;         org-ref-insert-ref-function 'org-ref-insert-ref-link))
+(use-package org-ref
+  :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
+  :init
+  (require 'bibtex) ; Requires bibtex org sub-module
+  (setq bibtex-autokey-year-length 4
+        bibtex-autokey-name-year-separator "-"
+        bibtex-autokey-year-title-separator "-"
+        bibtex-autokey-titleword-separator "-"
+        bibtex-autokey-titlewords 2
+        bibtex-autokey-titlewords-stretch 1
+        bibtex-autokey-titleword-lenght 5
+        bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
+  (require 'org-ref-helm)
+  (setq org-ref-insert-link-function 'org-ref-link-hydra/body
+        org-ref-insert-cite-function 'org-ref-cite-insert-helm
+        org-ref-insert-label-function 'org-ref-insert-label-link
+        org-ref-insert-ref-function 'org-ref-insert-ref-link
+           org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))))
 
-(use-package citar
-  :bind (("C-c b" . citar-insert-citation)
-         :map minibuffer-local-map
-         ("M-b" . citar-insert-preset))
-  :custom
-  ;; (org-cite-insert-processor 'citar)
-  ;; (org-cite-follow-processor 'citar)
-  ;; (org-cite-activate-processor 'citar)
-  ;; (citar-bibliography org-cite-global-bibliography)
-  (citar-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")))
-
-(setq ;; citar-symbols
-      ;; `((file ,(all-the-icons-faicon "file-o" :face 'all-the-icons-green :v-adjust -0.1) . " ")
-      ;;   (note ,(all-the-icons-material "speaker_notes" :face 'all-the-icons-blue :v-adjust -0.3) . " ")
-      ;;   (link ,(all-the-icons-octicon "link" :face 'all-the-icons-orange :v-adjust 0.01) . " "))
-      citar-symbol-separator "  "
-      citar-filenotify-callback 'refresh-cache
-      citar-open-note-function 'orb-citar-edit-note)
+(define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link-hydra/body)
 
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
-  (require 'org-roam-protocol)
-  :bind (("C-c n l" . org-roam-buffer-toggle)
-         ("C-c n f" . org-roam-node-find)
-         ("C-c n g" . org-roam-graph)
-         ("C-c n i" . org-roam-node-insert)
-         ("C-c n c" . org-roam-capture)
-         ;; ("C-c n a a" . org-roam-alias-add)
-         ;; ("C-c n a A" . org-roam-alias-remove)
-         ;; ("C-c n a t" . org-roam-tag-add)
-         ;; ("C-c n a T" . org-roam-tag-remove)
-         ;; ("C-c n a r" . org-roam-ref-add)
-         ;; ("C-c n a R" . org-roam-ref-remove)
-         ("C-c n j" . org-roam-dailies-capture-today))
-  ;; :map org-mode-map
-  ;; ("C-c i c" . completion-at-point)
-  ;; ("C-c i p" . org-insert-link)
+  ;; (require 'org-roam-protocol)
   :custom
         (org-roam-db-update-on-save t) ; May need to be disable for performance
         (org-roam-completion-everywhere t)
@@ -514,6 +498,112 @@
 ;;; Set sub-dirctory for Roam Journal entries
 (setq org-roam-dailies-directory "Journal")
 
+(global-set-key (kbd "C-c n") org-roam-mode-map)
+
+(defvar org-roam-mode-map (make-sparse-keymap)
+  "Prefix key for all Roam actions.")
+
+
+(define-key org-roam-mode-map (kbd "b") 'org-roam-buffer-toggle)
+(define-key org-roam-mode-map (kbd "g") 'org-roam-graph)
+(define-key org-roam-mode-map (kbd "i") 'org-roam-node-insert)
+(define-key org-roam-mode-map (kbd "c") 'org-roam-capture)
+
+(defvar org-roam-meta-data-map (make-sparse-keymap)
+  "Prefix key for adding or removing Roam Meta-data.")
+(define-key org-roam-mode-map (kbd "a") org-roam-meta-data-map)
+
+(define-key org-roam-meta-data-map (kbd "a") 'org-roam-alias-add)
+(define-key org-roam-meta-data-map (kbd "A") 'org-roam-alias-remove)
+(define-key org-roam-meta-data-map (kbd "t") 'org-roam-tag-add)
+(define-key org-roam-meta-data-map (kbd "T") 'org-roam-tag-remove)
+(define-key org-roam-meta-data-map (kbd "r") 'org-roam-ref-add)
+(define-key org-roam-meta-data-map (kbd "R") 'org-roam-ref-remove)
+
+(defvar org-roam-search-map (make-sparse-keymap)
+  "Prefix key for searching based on tags.")
+(define-key org-roam-mode-map (kbd "f") org-roam-search-map)
+
+(define-key org-roam-search-map (kbd "n") 'org-roam-node-find)
+
+(define-key org-roam-search-map (kbd "c") 'find-core-tag)
+(define-key org-roam-search-map (kbd "l") 'find-litterature-tag)
+(define-key org-roam-search-map (kbd "r") 'find-reference-tag)
+(define-key org-roam-search-map (kbd "n") 'find-noun-tag)
+(define-key org-roam-search-map (kbd "i") 'find-index-tag)
+(define-key org-roam-search-map (kbd "v") 'find-void-tag)
+(define-key org-roam-search-map (kbd "f") 'find-file-tag)
+
+(defun core-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "core" tags)))
+
+(defun find-core-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'core-search))
+
+(defun litterature-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "lit" tags)))
+
+(defun find-litterature-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'litterature-search))
+
+(defun reference-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "ref" tags)))
+
+(defun find-reference-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'reference-search))
+
+(defun noun-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "noun" tags)))
+
+(defun find-noun-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'noun-search))
+
+(defun index-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "index" tags)))
+
+(defun find-index-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'index-search))
+
+(defun void-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "void" tags)))
+
+(defun find-void-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'void-search))
+
+(defun file-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "file" tags)))
+
+(defun find-file-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'file-search))
+
+(defvar org-roam-journal-map (make-sparse-keymap)
+  "Prefix key for Roam journal actions.")
+(define-key org-roam-mode-map (kbd "j") org-roam-journal-map)
+
+
+(define-key org-roam-mode-map (kbd "j") 'org-roam-dailies-capture-today)
+
 (use-package org-fc
   :straight
   (org-fc
@@ -542,7 +632,7 @@
 
 (use-package org-transclusion
   :after org)
-(define-key global-map (kbd "<f12>") #'org-transclusion-add)
+(define-key org-mode-map (kbd "<f12>") #'org-transclusion-add)
 
 (use-package org-pdfview
   :config
