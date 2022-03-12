@@ -335,6 +335,7 @@
 (use-package org
   :hook (org-mode . technonomicon/org-mode-setup)
         (org-mode . technonomicon/org-font-setup)
+        (before-save . Tn/org-set-last-modified)
   :config
   (setq org-ellipsis " ▾"
         org-hide-emphasis-markers t
@@ -348,6 +349,7 @@
         org-cycle-separator-lines 2
         org-confirm-babel-evaluate nil
         org-capture-bookmark nil)
+
 (evil-define-key '(normal insert visual) org-mode-map (kbd "C-j") 'org-next-visible-heading)
 (evil-define-key '(normal insert visual) org-mode-map (kbd "C-k") 'org-previous-visible-heading)
 
@@ -365,6 +367,53 @@
 
 (require 'org-tempo)
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+
+(defun Tn/org-find-time-file-property (property &optional anywhere)
+    "Return the position of the time file PROPERTY if it exists.
+When ANYWHERE is non-nil, search beyond the preamble."
+    (save-excursion
+      (goto-char (point-min))
+      (let ((first-heading
+             (save-excursion
+               (re-search-forward org-outline-regexp-bol nil t))))
+        (when (re-search-forward (format "^#\\+%s:" property)
+                                 (if anywhere nil first-heading)
+                                 t)
+          (point)))))
+
+  (defun Tn/org-has-time-file-property-p (property &optional anywhere)
+    "Return the position of time file PROPERTY if it is defined.
+As a special case, return -1 if the time file PROPERTY exists but
+is not defined."
+    (when-let ((pos (Tn/org-find-time-file-property property anywhere)))
+      (save-excursion
+        (goto-char pos)
+        (if (and (looking-at-p " ")
+                 (progn (forward-char)
+                        (org-at-timestamp-p 'lax)))
+            pos
+          -1))))
+
+  (defun Tn/org-set-time-file-property (property &optional anywhere pos)
+    "Set the time file PROPERTY in the preamble.
+When ANYWHERE is non-nil, search beyond the preamble.
+If the position of the file PROPERTY has already been computed,
+it can be passed in POS."
+    (when-let ((pos (or pos
+                        (Tn/org-find-time-file-property property))))
+      (save-excursion
+        (goto-char pos)
+        (if (looking-at-p " ")
+            (forward-char)
+          (insert " "))
+        (delete-region (point) (line-end-position))
+        (let* ((now (format-time-string "[%Y-%m-%d %a %H:%M]")))
+          (insert now)))))
+
+  (defun Tn/org-set-last-modified ()
+    "Update the LAST_MODIFIED file property in the preamble."
+    (when (derived-mode-p 'org-mode)
+      (Tn/org-set-time-file-property "LAST_MODIFIED")))
 
 (use-package tex
   :straight auctex)
@@ -407,7 +456,7 @@
 (setq bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
       bibtex-completion-library-path '("~/Library")
       bibtex-completion-pdf-field "file"
-      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Nodes/references"
+      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Nodes"
       bibtex-completion-additional-search-fields '(keywords)
       bibtex-completion-pdf-symbol "⌘"
       bibtex-completion-notes-symbol "✎"
@@ -420,10 +469,10 @@
 (define-key helm-command-map "n" 'helm-bibtex-with-notes)
 (define-key helm-command-map (kbd "<menu>") 'helm-resume)
 
-(use-package org-roam-bibtex
-  :after org-roam)
-
-(setq orb-preformat-keywords '("citekey" "author" "date"))
+;; (use-package org-roam-bibtex
+;;   :after org-roam
+;;   :config
+;;   (setq orb-preformat-keywords '("citekey" "author" "date")))
 
 (use-package org-ref
   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
@@ -445,6 +494,7 @@
            org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))))
 
 (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link-hydra/body)
+(define-key org-mode-map (kbd "C-c b") 'org-ref-insert-link)
 
 (use-package org-roam
   :init
@@ -471,6 +521,13 @@
           (file "~/Neuromancer/Grimoire/Files/Templates/reference-default.org")
           :if-new (file+head "references/${citekey}.org" "#+title: ${title}\n")
           :unarrowed t)
+
+;;          ("r" "bibliography reference" plain
+;;          "%?
+;; %^{author} published %^{entry-type} in %^{date}: fullcite:%\\1."
+;;          :target
+;;          (file+head "references/${citekey}.org" "#+title: ${title}\n")
+;;          :unnarrowed t)
 
          ("s" "Zettle Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/zettle-default.org")
