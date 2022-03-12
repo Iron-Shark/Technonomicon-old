@@ -1,7 +1,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ~/Voyager-Config/emacs.d/init.el
 #+Author: Que Fanning
 #+Title: Emacs Literate Configuration
-#+LAST_MODIFIED: [2022-03-12 Sat 14:49]
+#+LAST_MODIFIED: [2022-03-12 Sat 14:57]
 
 * Package Management
 ** Warning Message
@@ -629,6 +629,12 @@ it can be passed in POS."
 (use-package slime)
 
 (setq inferior-lisp-program "sbcl")
+#+end_src
+
+*** Nix
+#+begin_src emacs-lisp
+(use-package nix-mode
+  :mode "\\.nix\\'")
 #+end_src
 
 * Knowledge Management

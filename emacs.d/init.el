@@ -427,6 +427,9 @@ it can be passed in POS."
 
 (setq inferior-lisp-program "sbcl")
 
+(use-package nix-mode
+  :mode "\\.nix\\'")
+
 (setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
                                     ("file" "Link to source file" ":")
                                     ("Summary" "Summary of source" ""))
@@ -456,7 +459,7 @@ it can be passed in POS."
 (setq bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib")
       bibtex-completion-library-path '("~/Library")
       bibtex-completion-pdf-field "file"
-      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Nodes"
+      bibtex-completion-notes-path "~/Neuromancer/Grimoire/Nodes/References"
       bibtex-completion-additional-search-fields '(keywords)
       bibtex-completion-pdf-symbol "⌘"
       bibtex-completion-notes-symbol "✎"
@@ -469,10 +472,12 @@ it can be passed in POS."
 (define-key helm-command-map "n" 'helm-bibtex-with-notes)
 (define-key helm-command-map (kbd "<menu>") 'helm-resume)
 
-;; (use-package org-roam-bibtex
-;;   :after org-roam
-;;   :config
-;;   (setq orb-preformat-keywords '("citekey" "author" "date")))
+(use-package org-roam-bibtex
+  :after org-roam
+  :config
+  (require 'org-ref)
+  (org-roam-bibtex-mode 1)
+  (setq orb-preformat-keywords '("citekey" "author" "date")))
 
 (use-package org-ref
   :after helm-bibtex ; Initializes org-ref after helm-bibtex has loaded
@@ -485,6 +490,7 @@ it can be passed in POS."
         bibtex-autokey-titlewords 2
         bibtex-autokey-titlewords-stretch 1
         bibtex-autokey-titleword-lenght 5
+        bibtex-dialect 'biblatex
         bibtex-completion-bibliography '("~/Neuromancer/Grimoire/Files/Globals/Bibliography.bib"))
   (require 'org-ref-helm)
   (setq org-ref-insert-link-function 'org-ref-link-hydra/body
@@ -504,7 +510,7 @@ it can be passed in POS."
         (org-roam-db-update-on-save t) ; May need to be disable for performance
         (org-roam-completion-everywhere t)
         (org-roam-directory "~/Neuromancer/Grimoire/Nodes")
-        (org-roam-dailies-directory "Journal/")
+        (org-roam-dailies-directory "Journal")
         (org-roam-dailes-capture-templates
         '(("d" "Journal" plain
            (file "~/Neuromancer/Grimoire/Files/Templates/journal.org")
@@ -519,15 +525,8 @@ it can be passed in POS."
 
          ("r" "Reference Summary" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/reference-default.org")
-          :if-new (file+head "references/${citekey}.org" "#+title: ${title}\n")
+          :if-new (file+head "References/${citekey}.org" "#+title: ${title}\n")
           :unarrowed t)
-
-;;          ("r" "bibliography reference" plain
-;;          "%?
-;; %^{author} published %^{entry-type} in %^{date}: fullcite:%\\1."
-;;          :target
-;;          (file+head "references/${citekey}.org" "#+title: ${title}\n")
-;;          :unnarrowed t)
 
          ("s" "Zettle Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/zettle-default.org")
