@@ -332,6 +332,14 @@
 (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
 (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
 
+(use-package org-appear)
+(add-hook 'org-mode-hook 'org-appear-mode)
+
+;;; Integrates org-appear with Evil-mode
+(setq org-appear-trigger 'manual)
+(add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start)
+(add-hook 'evil-insert-state-exit-hook #'org-appear-manual-stop)
+
 (use-package org
   :hook (org-mode . technonomicon/org-mode-setup)
         (org-mode . technonomicon/org-font-setup)
@@ -512,15 +520,15 @@ it can be passed in POS."
         (org-roam-directory "~/Neuromancer/Grimoire/Nodes")
         (org-roam-dailies-directory "Journal")
         (org-roam-dailes-capture-templates
-        '(("d" "Journal" plain
-           (file "~/Neuromancer/Grimoire/Files/Templates/journal.org")
+        '(("j" "Journal" plain
+           (file "~/Neuromancer/Grimoire/Files/Templates/journal-default.org")
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
            :unnarrowed t)))
 
        (org-roam-capture-templates
        '(("l" "Literature Note Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/litterature-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("r" "Reference Summary" plain
@@ -530,12 +538,32 @@ it can be passed in POS."
 
          ("s" "Zettle Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/zettle-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("i" "Index Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/index-default.org")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("f" "File Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/file-default.org")
+          :if-new (file+head "Files/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("n" "Noun Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/noun-default.org")
+          :if-new (file+head "Noun/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("v" "Void Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/void-default.org")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("d" "Default" plain
           "%?"
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)))
 
   :config
@@ -580,7 +608,7 @@ it can be passed in POS."
   "Prefix key for searching based on tags.")
 (define-key org-roam-mode-map (kbd "f") org-roam-search-map)
 
-(define-key org-roam-search-map (kbd "n") 'org-roam-node-find)
+(define-key org-roam-search-map (kbd "a") 'org-roam-node-find)
 
 (define-key org-roam-search-map (kbd "c") 'find-core-tag)
 (define-key org-roam-search-map (kbd "l") 'find-litterature-tag)
@@ -589,6 +617,7 @@ it can be passed in POS."
 (define-key org-roam-search-map (kbd "i") 'find-index-tag)
 (define-key org-roam-search-map (kbd "v") 'find-void-tag)
 (define-key org-roam-search-map (kbd "f") 'find-file-tag)
+(define-key org-roam-search-map (kbd "t") 'find-ToDo-tag)
 
 (defun core-search (node)
   (interactive)
@@ -653,6 +682,15 @@ it can be passed in POS."
   (interactive)
   (org-roam-node-find t nil 'file-search))
 
+(defun ToDo-search (node)
+  (interactive)
+  (let ((tags (org-roam-node-tags node)))
+    (member "ToDo" tags)))
+
+(defun find-ToDo-tag ()
+  (interactive)
+  (org-roam-node-find t nil 'file-search))
+
 (defvar org-roam-journal-map (make-sparse-keymap)
   "Prefix key for Roam journal actions.")
 (define-key org-roam-mode-map (kbd "j") org-roam-journal-map)
@@ -666,10 +704,9 @@ it can be passed in POS."
    :type git :repo "https://git.sr.ht/~l3kn/org-fc"
    :files (:defaults "awk" "demo.org"))
   :custom
-  (org-fc-directories '("~/Archive/Nodes/"
-                        "~/Archive/Files/"
+  (org-fc-directories '("~/Neuromancer/Grimoire/Nodes/"
+                        "~/Neuromancer/Grimoire/Files/"
                         "~/Projects"))
-  :config
   (require 'org-fc-hydra))
 
 (evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-flip-mode
