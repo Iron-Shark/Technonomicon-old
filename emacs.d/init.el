@@ -99,6 +99,20 @@
                                        "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
                                        "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
                                        "\\\\" "://"))
+  ;; Enable ligatures in org-mode
+  (ligature-set-ligatures 'org-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
+                                       ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
+                                       "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
+                                       "<~~" "<~>" "<*>" "<||" "<|>" "<$>" "<==" "<=>" "<=<" "<->"
+                                       "<--" "<-<" "<<=" "<<-" "<<<" "<+>" "</>" "###" "#_(" "..<"
+                                       "..." "+++" "/==" "///" "_|_" "www" "&&" "^=" "~~" "~@" "~="
+                                       "~>" "~-" "**" "*>" "*/" "||" "|}" "|]" "|=" "|>" "|-" "{|"
+                                       "[|" "]#" "::" ":=" ":>" ":<" "$>" "==" "=>" "!=" "!!" ">:"
+                                       ">=" ">>" ">-" "-~" "-|" "->" "--" "-<" "<~" "<*" "<|" "<:"
+                                       "<$" "<=" "<>" "<-" "<<" "<+" "</" "#{" "#[" "#:" "#=" "#!"
+                                       "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
+                                       "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
+                                       "\\\\" "://"))
   ;; Enables ligature checks globally in all buffers. You can also do it
   ;; per mode with `ligature-mode'.
   (global-ligature-mode t))
@@ -518,12 +532,6 @@ it can be passed in POS."
         (org-roam-db-update-on-save t) ; May need to be disable for performance
         (org-roam-completion-everywhere t)
         (org-roam-directory "~/Neuromancer/Grimoire/Nodes")
-        (org-roam-dailies-directory "Journal")
-        (org-roam-dailes-capture-templates
-        '(("j" "Journal" plain
-           (file "~/Neuromancer/Grimoire/Files/Templates/journal-default.org")
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-           :unnarrowed t)))
 
        (org-roam-capture-templates
        '(("l" "Literature Note Default" plain
@@ -568,7 +576,61 @@ it can be passed in POS."
 
   :config
        (org-roam-db-autosync-mode)
-       (org-roam-setup))
+       (org-roam-setup)
+       (require 'org-roam-dailies))
+
+(setup (:pkg org-roam :straight t)
+  (setq org-roam-v2-ack t)
+  (setq dw/daily-note-filename "%<%Y-%m-%d>.org"
+        dw/daily-note-header "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")
+
+  (:when-loaded
+    (org-roam-db-autosync-mode)
+    (my/org-roam-refresh-agenda-list))
+
+  (:option
+   org-roam-directory "~/Notes/Roam/"
+   org-roam-dailies-directory "Journal/"
+   org-roam-completion-everywhere t
+   org-roam-capture-templates
+   '(("d" "default" plain "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                         "#+title: ${title}\n")
+      :unnarrowed t))
+   org-roam-dailies-capture-templates
+   `(("d" "default" entry
+      "* %?"
+      :if-new (file+head ,dw/daily-note-filename
+                         ,dw/daily-note-header))
+     ("t" "task" entry
+      "* TODO %?\n  %U\n  %a\n  %i"
+      :if-new (file+head+olp ,dw/daily-note-filename
+                             ,dw/daily-note-header
+                             ("Tasks"))
+      :empty-lines 1)
+     ("l" "log entry" entry
+      "* %<%I:%M %p> - %?"
+      :if-new (file+head+olp ,dw/daily-note-filename
+                             ,dw/daily-note-header
+                             ("Log")))
+     ("j" "journal" entry
+      "* %<%I:%M %p> - Journal  :journal:\n\n%?\n\n"
+      :if-new (file+head+olp ,dw/daily-note-filename
+                             ,dw/daily-note-header
+                             ("Log")))
+     ("m" "meeting" entry
+      "* %<%I:%M %p> - %^{Meeting Title}  :meetings:\n\n%?\n\n"
+      :if-new (file+head+olp ,dw/daily-note-filename
+                             ,dw/daily-note-header
+                             ("Log")))))
+  (:global "C-c n l" org-roam-buffer-toggle
+           "C-c n f" org-roam-node-find
+           "C-c n d" dw/org-roam-jump-menu/body
+           "C-c n c" org-roam-dailies-capture-today
+           "C-c n t" dw/org-roam-capture-task
+           "C-c n g" org-roam-graph)
+  (:bind "C-c n i" org-roam-node-insert
+         "C-c n I" org-roam-insert-immediate))
 
 (add-to-list 'display-buffer-alist
              '("\\*org-roam\\*"
@@ -592,6 +654,26 @@ it can be passed in POS."
 (define-key org-roam-mode-map (kbd "g") 'org-roam-graph)
 (define-key org-roam-mode-map (kbd "i") 'org-roam-node-insert)
 (define-key org-roam-mode-map (kbd "c") 'org-roam-capture)
+
+(defhydra dw/org-roam-jump-menu (:hint nil)
+  "
+^Dailies^        ^Capture^       ^Jump^
+^^^^^^^^-------------------------------------------------
+_t_: today       _T_: today       _m_: current month
+_r_: tomorrow    _R_: tomorrow    _e_: current year
+_y_: yesterday   _Y_: yesterday   ^ ^
+_d_: date        ^ ^              ^ ^
+"
+  ("t" org-roam-dailies-goto-today)
+  ("r" org-roam-dailies-goto-tomorrow)
+  ("y" org-roam-dailies-goto-yesterday)
+  ("d" org-roam-dailies-goto-date)
+  ("T" org-roam-dailies-capture-today)
+  ("R" org-roam-dailies-capture-tomorrow)
+  ("Y" org-roam-dailies-capture-yesterday)
+  ("m" dw/org-roam-goto-month)
+  ("e" dw/org-roam-goto-year)
+  ("c" nil "cancel"))
 
 (defvar org-roam-meta-data-map (make-sparse-keymap)
   "Prefix key for adding or removing Roam Meta-data.")
@@ -691,12 +773,67 @@ it can be passed in POS."
   (interactive)
   (org-roam-node-find t nil 'file-search))
 
+(defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (push arg args))
+        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                  '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
+
+(defun my/org-roam-refresh-agenda-list ()
+  (interactive)
+  (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+
+;; (setq org-roam-dailies-capture-templates
+;;         '(("j" "Journal" entry "* %<%I:%M %p>: %?"
+;;            (file "~/Neuromancer/Grimoire/Files/Templates/journal-default.org")
+;;            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: %<%Y-%m-%d>\n")
+;;            :unnarrowed t)))
+        (setq org-roam-dailies-directory "Journal")
+
+(setq org-roam-dailies-capture-templates
+      `(("j" "journal" entry "* %?"
+         :if-new (file+head ,Tn/daily-note-filename
+                            ,Tn/daily-note-header)))
+
 (defvar org-roam-journal-map (make-sparse-keymap)
   "Prefix key for Roam journal actions.")
-(define-key org-roam-mode-map (kbd "j") org-roam-journal-map)
+;(define-key org-roam-mode-map (kbd "j") org-roam-journal-map)
 
 
 (define-key org-roam-mode-map (kbd "j") 'org-roam-dailies-capture-today)
+
+(setq Tn/daily-note-filename "%<%Y-%m-%d>.org"
+      Tn/daily-note-header "#+TITLE: %<%Y-%m-%d %a>\n[[roam:%<%Y-%B>]]\n#+FILETAGS: :journal:\n#+LAST_MODIFIED:\n#+AUTHOR: Que\n\n")
+
+(defun dw/org-roam-goto-month ()
+  (interactive)
+  (org-roam-capture- :goto (when (org-roam-node-from-title-or-alias (format-time-string "%Y-%B")) '(4))
+                     :node (org-roam-node-create)
+                     :templates '(("m" "month" plain "\n* Goals\n\n%?* Summary\n\n"
+                                   :if-new (file+head "%<%Y-%B>.org"
+                                                      "#+title: %<%Y-%B>\n#+filetags: Project\n")
+                                   :unnarrowed t))))
+
+(defun dw/org-roam-goto-year ()
+  (interactive)
+  (org-roam-capture- :goto (when (org-roam-node-from-title-or-alias (format-time-string "%Y")) '(4))
+                     :node (org-roam-node-create)
+                     :templates '(("y" "year" plain "\n* Goals\n\n%?* Summary\n\n"
+                                   :if-new (file+head "%<%Y>.org"
+                                                      "#+title: %<%Y>\n#+filetags: Project\n")
+                                   :unnarrowed t))))
+
+(defun dw/org-roam-capture-task ()
+  (interactive)
+  ;; Add the project file to the agenda after capture is finished
+  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
+
+  ;; Capture the new task, creating the project file if necessary
+  (org-roam-capture- :node (org-roam-node-read
+                            nil
+                            (my/org-roam-filter-by-tag "Project"))
+                     :templates (list dw/org-roam-project-template)))
 
 (use-package org-fc
   :straight
