@@ -1,7 +1,7 @@
-#+PROPERTY: header-args:emacs-lisp :tangle ~/Voyager-Config/emacs.d/init.el
+#+PROPERTY: header-args:emacs-lisp :tangle ~/.config/emacs/init.el
 #+Author: Que Fanning
 #+Title: Emacs Literate Configuration
-#+LAST_MODIFIED: [2022-03-14 Mon 11:17]
+#+LAST_MODIFIED: [2022-03-15 Tue 14:27]
 
 * Package Management
 ** Warning Message
@@ -160,7 +160,6 @@ Adds ligature support to text buffers.
                                          "##" "#(" "#?" "#_" "%%" ".=" ".-" ".." ".?" "+>" "++" "?:"
                                          "?=" "?." "??" ";;" "/*" "/=" "/>" "//" "__" "~~" "(*" "*)"
                                          "\\\\" "://"))
-    ;; Enable ligatures in org-mode
     (ligature-set-ligatures 'org-mode '("|||>" "<|||" "<==>" "<!--" "####" "~~>" "***" "||=" "||>"
                                          ":::" "::=" "=:=" "===" "==>" "=!=" "=>>" "=<<" "=/=" "!=="
                                          "!!." ">=>" ">>=" ">>>" ">>-" ">->" "->>" "-->" "---" "-<<"
@@ -244,7 +243,7 @@ Adds ligature support to text buffers.
 (savehist-mode 1)
 
 ;;; Custom File Declaration
-(setq custom-file "~/Voyager-Config/emacs.d/custom.el")
+(setq custom-file "~/.config/emacs/custom.el")
 (load custom-file)
 
 ;;; History and Message Buffer Tracking
@@ -367,6 +366,19 @@ Chord focused keybinding management
 Multi / Repeated input keybinding management.
 #+begin_src emacs-lisp
 (use-package hydra)
+
+;;; Functions to move between hydra's
+(defvar hydra-stack nil)
+
+(defun hydra-push (expr)
+  (push `(lambda () ,expr) hydra-stack))
+
+
+(defun hydra-pop ()
+  (interactive)
+  (let ((x (pop hydra-stack)))
+    (when x
+      (funcall x))))
 #+end_src
 
 ** Parentheses
@@ -523,17 +535,6 @@ Allows fuzzy matching with company.
   (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
   (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
-#+end_src
-
-****** Display Emphasis Characters when Under Point
-#+begin_src emacs-lisp
-(use-package org-appear)
-(add-hook 'org-mode-hook 'org-appear-mode)
-
-;;; Integrates org-appear with Evil-mode
-(setq org-appear-trigger 'manual)
-(add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start)
-(add-hook 'evil-insert-state-exit-hook #'org-appear-manual-stop)
 #+end_src
 
 **** Org Core
@@ -763,11 +764,17 @@ it can be passed in POS."
         (org-roam-db-update-on-save t) ; May need to be disable for performance
         (org-roam-completion-everywhere t)
         (org-roam-directory "~/Neuromancer/Grimoire/Nodes")
+        (org-roam-dailies-directory "Journal")
+        (org-roam-dailes-capture-templates
+        '(("j" "Journal" plain
+           (file "~/Neuromancer/Grimoire/Files/Templates/journal.org")
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
 
        (org-roam-capture-templates
        '(("l" "Literature Note Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/litterature-default.org")
-          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("r" "Reference Summary" plain
@@ -777,93 +784,37 @@ it can be passed in POS."
 
          ("s" "Zettle Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/zettle-default.org")
-          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("i" "Index Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/index-default.org")
-          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-          :unnarrowed t)
-
-         ("f" "File Default" plain
-          (file "~/Neuromancer/Grimoire/Files/Templates/file-default.org")
-          :if-new (file+head "Files/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-          :unnarrowed t)
-
-         ("n" "Noun Default" plain
-          (file "~/Neuromancer/Grimoire/Files/Templates/noun-default.org")
-          :if-new (file+head "Noun/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("v" "Void Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/void-default.org")
-          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("n" "Noun Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/noun-default.org")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :unnarrowed t)
+
+         ("f" "File Default" plain
+          (file "~/Neuromancer/Grimoire/Files/Templates/file-default.org")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("d" "Default" plain
           "%?"
-          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)))
 
   :config
        (org-roam-db-autosync-mode)
-       (org-roam-setup)
-       (require 'org-roam-dailies))
-#+end_src
-from s/c
-#+begin_src emacs-lisp
-(setup (:pkg org-roam :straight t)
-  (setq org-roam-v2-ack t)
-  (setq dw/daily-note-filename "%<%Y-%m-%d>.org"
-        dw/daily-note-header "#+title: %<%Y-%m-%d %a>\n\n[[roam:%<%Y-%B>]]\n\n")
-
-  (:when-loaded
-    (org-roam-db-autosync-mode)
-    (my/org-roam-refresh-agenda-list))
-
-  (:option
-   org-roam-directory "~/Notes/Roam/"
-   org-roam-dailies-directory "Journal/"
-   org-roam-completion-everywhere t
-   org-roam-capture-templates
-   '(("d" "default" plain "%?"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                         "#+title: ${title}\n")
-      :unnarrowed t))
-   org-roam-dailies-capture-templates
-   `(("d" "default" entry
-      "* %?"
-      :if-new (file+head ,dw/daily-note-filename
-                         ,dw/daily-note-header))
-     ("t" "task" entry
-      "* TODO %?\n  %U\n  %a\n  %i"
-      :if-new (file+head+olp ,dw/daily-note-filename
-                             ,dw/daily-note-header
-                             ("Tasks"))
-      :empty-lines 1)
-     ("l" "log entry" entry
-      "* %<%I:%M %p> - %?"
-      :if-new (file+head+olp ,dw/daily-note-filename
-                             ,dw/daily-note-header
-                             ("Log")))
-     ("j" "journal" entry
-      "* %<%I:%M %p> - Journal  :journal:\n\n%?\n\n"
-      :if-new (file+head+olp ,dw/daily-note-filename
-                             ,dw/daily-note-header
-                             ("Log")))
-     ("m" "meeting" entry
-      "* %<%I:%M %p> - %^{Meeting Title}  :meetings:\n\n%?\n\n"
-      :if-new (file+head+olp ,dw/daily-note-filename
-                             ,dw/daily-note-header
-                             ("Log")))))
-  (:global "C-c n l" org-roam-buffer-toggle
-           "C-c n f" org-roam-node-find
-           "C-c n d" dw/org-roam-jump-menu/body
-           "C-c n c" org-roam-dailies-capture-today
-           "C-c n t" dw/org-roam-capture-task
-           "C-c n g" org-roam-graph)
-  (:bind "C-c n i" org-roam-node-insert
-         "C-c n I" org-roam-insert-immediate))
+       (org-roam-setup))
 #+end_src
 
 **** Display Format
@@ -885,70 +836,79 @@ from s/c
 
 ***** General
 #+begin_src emacs-lisp
-(global-set-key (kbd "C-c n") org-roam-mode-map)
+(global-set-key (kbd "C-c n") 'Tn/org-roam-menu-hydra/body)
 
-(defvar org-roam-mode-map (make-sparse-keymap)
-  "Prefix key for all Roam actions.")
-
-
-(define-key org-roam-mode-map (kbd "b") 'org-roam-buffer-toggle)
-(define-key org-roam-mode-map (kbd "g") 'org-roam-graph)
-(define-key org-roam-mode-map (kbd "i") 'org-roam-node-insert)
-(define-key org-roam-mode-map (kbd "c") 'org-roam-capture)
-#+end_src
-from s/c
-#+begin_src emacs-lisp
-(defhydra dw/org-roam-jump-menu (:hint nil)
+(defhydra Tn/org-roam-menu-hydra (:color teal :hint nil)
   "
-^Dailies^        ^Capture^       ^Jump^
-^^^^^^^^-------------------------------------------------
-_t_: today       _T_: today       _m_: current month
-_r_: tomorrow    _R_: tomorrow    _e_: current year
-_y_: yesterday   _Y_: yesterday   ^ ^
-_d_: date        ^ ^              ^ ^
+ ^Search^          ^Insert^            ^Utilities^
+------------------------------------------------------------------
+_f_: Find         _I_: Insert         _b_: Roam Buffer
+_r_: Find Map     _^_: Insert Void    _g_: Roam Graph
+_d_: Journal Map  _i_: Insert Map     _m_: Roam Meta-Data
+------------------------------------------------------------------
+_k_: Org Capture  _c_: Roam Capture   _j_: Journal Capture
 "
-  ("t" org-roam-dailies-goto-today)
-  ("r" org-roam-dailies-goto-tomorrow)
-  ("y" org-roam-dailies-goto-yesterday)
-  ("d" org-roam-dailies-goto-date)
-  ("T" org-roam-dailies-capture-today)
-  ("R" org-roam-dailies-capture-tomorrow)
-  ("Y" org-roam-dailies-capture-yesterday)
-  ("m" dw/org-roam-goto-month)
-  ("e" dw/org-roam-goto-year)
-  ("c" nil "cancel"))
+  ("j" org-roam-dailies-capture-today)
+  ("b" org-roam-buffer-toggle)
+  ("f" org-roam-node-find)
+  ("g" org-roam-graph)
+  ("I" org-roam-node-insert)
+  ("c" org-roam-capture)
+  ("k" org-capture)
+  ("m" (progn
+         (Tn/org-roam-meta-data-hydra/body)
+         (hydra-push '(Tn/org-roam-menu-hydra/body))))
+  ("r" (progn
+         (Tn/org-roam-search-hydra/body)
+         (hydra-push '(Tn/org-roam-menu-hydra/body))))
+  ("i" (progn
+         (Tn/org-roam-insert-hydra/body)
+         (hydra-push '(Tn/org-roam-menu-hydra/body))))
+  ("d" (progn
+         (Tn/org-roam-journal-hydra/body)
+         (hydra-push '(Tn/org-roam-menu-hydra/body))))
+  ("ESC" nil "cancel"))
+
 #+end_src
 
 ***** Meta-Data
 #+begin_src emacs-lisp
-(defvar org-roam-meta-data-map (make-sparse-keymap)
-  "Prefix key for adding or removing Roam Meta-data.")
-(define-key org-roam-mode-map (kbd "a") org-roam-meta-data-map)
-
-(define-key org-roam-meta-data-map (kbd "a") 'org-roam-alias-add)
-(define-key org-roam-meta-data-map (kbd "A") 'org-roam-alias-remove)
-(define-key org-roam-meta-data-map (kbd "t") 'org-roam-tag-add)
-(define-key org-roam-meta-data-map (kbd "T") 'org-roam-tag-remove)
-(define-key org-roam-meta-data-map (kbd "r") 'org-roam-ref-add)
-(define-key org-roam-meta-data-map (kbd "R") 'org-roam-ref-remove)
+(defhydra Tn/org-roam-meta-data-hydra (:color teal :hint nil)
+  "
+^Tags^            ^Alias^          ^Refernce-Keys^
+^^^^^^^^-----------------------------------------------------------
+_t_: add          _a_: Add         _r_: Add
+_T_: Remove       _A_: Remvoe      _R_: Remove
+"
+  ("t" org-roam-tag-add)
+  ("T" org-roam-tag-remove)
+  ("a" org-roam-alias-add)
+  ("A" org-roam-alias-remove)
+  ("r" org-roam-ref-add)
+  ("R" org-roam-ref-remove)
+  ("ESC" nil "cancel"))
 #+end_src
 
 ***** Search
 #+begin_src emacs-lisp
-(defvar org-roam-search-map (make-sparse-keymap)
-  "Prefix key for searching based on tags.")
-(define-key org-roam-mode-map (kbd "f") org-roam-search-map)
-
-(define-key org-roam-search-map (kbd "a") 'org-roam-node-find)
-
-(define-key org-roam-search-map (kbd "c") 'find-core-tag)
-(define-key org-roam-search-map (kbd "l") 'find-litterature-tag)
-(define-key org-roam-search-map (kbd "r") 'find-reference-tag)
-(define-key org-roam-search-map (kbd "n") 'find-noun-tag)
-(define-key org-roam-search-map (kbd "i") 'find-index-tag)
-(define-key org-roam-search-map (kbd "v") 'find-void-tag)
-(define-key org-roam-search-map (kbd "f") 'find-file-tag)
-(define-key org-roam-search-map (kbd "t") 'find-ToDo-tag)
+(defhydra Tn/org-roam-search-hydra (:color teal :hint nil)
+  "
+                ^Search Keys^
+----------------------------------------------------------------
+_c_: Core        _r_: Reference        _f_: File
+_n_: Noun        _l_: Litterature      _v_: Void
+       _d_: Default           _i_: Index
+"
+  ("c" find-core-tag)
+  ("l" find-litterature-tag)
+  ("r" find-reference-tag)
+  ("n" find-noun-tag)
+  ("i" find-index-tag)
+  ("d" org-roam-node-find)
+  ("v" find-void-tag)
+  ("f" find-file-tag)
+  ("n" org-roam-node-find)
+  ("ESC" nil "cancel"))
 #+end_src
 
 ****** Custom Search Functions
@@ -1037,91 +997,77 @@ _d_: date        ^ ^              ^ ^
   (org-roam-node-find t nil 'file-search))
 #+end_src
 
-******* ToDo
-#+begin_src emacs-lisp
-(defun ToDo-search (node)
-  (interactive)
-  (let ((tags (org-roam-node-tags node)))
-    (member "ToDo" tags)))
-
-(defun find-ToDo-tag ()
-  (interactive)
-  (org-roam-node-find t nil 'file-search))
-#+end_src
-
 ***** Insert
-from S/C
 #+begin_src emacs-lisp
-(defun org-roam-node-insert-immediate (arg &rest args)
-  (interactive "P")
-  (let ((args (push arg args))
-        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
-                                                  '(:immediate-finish t)))))
-    (apply #'org-roam-node-insert args)))
+(defhydra Tn/org-roam-insert-hydra (:color teal :hint nil)
+  "
+                ^Insert Keys^
+------------------------------------------------------------
+_c_: Core         _v_: Void        _n_: Noun
+_d_: Default      _r_: Referrence  _l_: Litterature
+"
+  ("c" insert-core-tag)
+  ("v" insert-void-tag)
+  ("l" insert-litterature-tag)
+  ("r" insert-referrence-tag)
+  ("n" insert-noun-tag)
+  ("d" org-roam-node-insert)
+  ("ESC" nil "cancel"))
 #+end_src
-***** Agenda Integration
+
+****** Custom Insert Functions
+
+******* Core
 #+begin_src emacs-lisp
-(defun my/org-roam-refresh-agenda-list ()
+(defun insert-core-tag ()
   (interactive)
-  (setq org-agenda-files (my/org-roam-list-notes-by-tag "Project")))
+  (org-roam-node-insert 'core-search))
 #+end_src
+
+******* Void
+#+begin_src emacs-lisp
+(defun insert-void-tag ()
+  (interactive)
+  (org-roam-node-insert 'void-search))
+#+end_src
+
+******* Litterature
+#+begin_src emacs-lisp
+(defun insert-litterature-tag ()
+  (interactive)
+  (org-roam-node-insert 'litterature-search))
+#+end_src
+
+******* Referrence
+#+begin_src emacs-lisp
+(defun insert-referrence-tag ()
+  (interactive)
+  (org-roam-node-insert 'referrence-search))
+#+end_src
+
+******* Noun
+#+begin_src emacs-lisp
+(defun insert-noun-tag ()
+  (interactive)
+  (org-roam-node-insert 'noun-search))
+#+end_src
+
 ***** Journal
 #+begin_src emacs-lisp
-;; (setq org-roam-dailies-capture-templates
-;;         '(("j" "Journal" entry "* %<%I:%M %p>: %?"
-;;            (file "~/Neuromancer/Grimoire/Files/Templates/journal-default.org")
-;;            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: %<%Y-%m-%d>\n")
-;;            :unnarrowed t)))
-        (setq org-roam-dailies-directory "Journal")
-
-(setq org-roam-dailies-capture-templates
-      `(("j" "journal" entry "* %?"
-         :if-new (file+head ,Tn/daily-note-filename
-                            ,Tn/daily-note-header)))
-
-(defvar org-roam-journal-map (make-sparse-keymap)
-  "Prefix key for Roam journal actions.")
-;(define-key org-roam-mode-map (kbd "j") org-roam-journal-map)
-
-
-(define-key org-roam-mode-map (kbd "j") 'org-roam-dailies-capture-today)
-#+end_src
-testing
-#+begin_src emacs-lisp
-(setq Tn/daily-note-filename "%<%Y-%m-%d>.org"
-      Tn/daily-note-header "#+TITLE: %<%Y-%m-%d %a>\n[[roam:%<%Y-%B>]]\n#+FILETAGS: :journal:\n#+LAST_MODIFIED:\n#+AUTHOR: Que\n\n")
-#+end_src
-
-#+begin_src emacs-lisp
-
-(defun dw/org-roam-goto-month ()
-  (interactive)
-  (org-roam-capture- :goto (when (org-roam-node-from-title-or-alias (format-time-string "%Y-%B")) '(4))
-                     :node (org-roam-node-create)
-                     :templates '(("m" "month" plain "\n* Goals\n\n%?* Summary\n\n"
-                                   :if-new (file+head "%<%Y-%B>.org"
-                                                      "#+title: %<%Y-%B>\n#+filetags: Project\n")
-                                   :unnarrowed t))))
-
-(defun dw/org-roam-goto-year ()
-  (interactive)
-  (org-roam-capture- :goto (when (org-roam-node-from-title-or-alias (format-time-string "%Y")) '(4))
-                     :node (org-roam-node-create)
-                     :templates '(("y" "year" plain "\n* Goals\n\n%?* Summary\n\n"
-                                   :if-new (file+head "%<%Y>.org"
-                                                      "#+title: %<%Y>\n#+filetags: Project\n")
-                                   :unnarrowed t))))
-
-(defun dw/org-roam-capture-task ()
-  (interactive)
-  ;; Add the project file to the agenda after capture is finished
-  (add-hook 'org-capture-after-finalize-hook #'my/org-roam-project-finalize-hook)
-
-  ;; Capture the new task, creating the project file if necessary
-  (org-roam-capture- :node (org-roam-node-read
-                            nil
-                            (my/org-roam-filter-by-tag "Project"))
-                     :templates (list dw/org-roam-project-template)))
+(defhydra Tn/org-roam-journal-hydra (:color teal :hint nil)
+  "
+             ^Goto^                    ^Capture^
+---------------------------------------------------------------
+_n_: Tomorrow     _j_: Today         _t_: Tomorrow
+_p_: Yesterday    _d_: Date          _y_: Yesterday
+"
+  ("j" org-roam-dailies-goto-today)
+  ("n" org-roam-dailies-goto-tomorrow)
+  ("p" org-roam-dailies-goto-yesterday)
+  ("d" org-roam-dailies-goto-date)
+  ("t" org-roam-dailies-capture-tomorrow)
+  ("y" org-roam-dailies-capture-yesterday)
+  ("ESC" nil "cancel"))
 #+end_src
 
 *** Org Flash Cards
@@ -1132,9 +1078,10 @@ testing
    :type git :repo "https://git.sr.ht/~l3kn/org-fc"
    :files (:defaults "awk" "demo.org"))
   :custom
-  (org-fc-directories '("~/Neuromancer/Grimoire/Nodes/"
-                        "~/Neuromancer/Grimoire/Files/"
+  (org-fc-directories '("~/Archive/Nodes/"
+                        "~/Archive/Files/"
                         "~/Projects"))
+  :config
   (require 'org-fc-hydra))
 
 (evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-flip-mode
