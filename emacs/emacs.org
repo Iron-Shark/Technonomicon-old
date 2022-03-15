@@ -1,7 +1,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.config/emacs/init.el
 #+Author: Que Fanning
 #+Title: Emacs Literate Configuration
-#+LAST_MODIFIED: [2022-03-15 Tue 16:13]
+#+LAST_MODIFIED: [2022-03-15 Tue 16:24]
 
 * Package Management
 ** Warning Message
@@ -535,6 +535,17 @@ Allows fuzzy matching with company.
   (set-face-attribute 'org-checkbox nil  :inherit 'fixed-pitch)
   (set-face-attribute 'line-number nil :inherit 'fixed-pitch)
   (set-face-attribute 'line-number-current-line nil :inherit 'fixed-pitch))
+#+end_src
+
+****** Display Emphasis Characters when Under Point
+#+begin_src emacs-lisp
+(use-package org-appear)
+(add-hook 'org-mode-hook 'org-appear-mode)
+
+;; Integrates org-appear with Evil Mode
+(setq org-appear-trigger 'manual)
+(add-hook 'evil-insert-state-entry-hook #'org-appear-manual-start)
+(add-hook 'evil-insert-state-exit-hook #'org-appear-manual-stop)
 #+end_src
 
 **** Org Core
