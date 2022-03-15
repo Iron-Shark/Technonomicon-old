@@ -1,7 +1,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.config/emacs/init.el
 #+Author: Que Fanning
 #+Title: Emacs Literate Configuration
-#+LAST_MODIFIED: [2022-03-15 Tue 14:27]
+#+LAST_MODIFIED: [2022-03-15 Tue 15:08]
 
 * Package Management
 ** Warning Message
@@ -842,15 +842,15 @@ it can be passed in POS."
   "
  ^Search^          ^Insert^            ^Utilities^
 ------------------------------------------------------------------
-_f_: Find         _I_: Insert         _b_: Roam Buffer
-_r_: Find Map     _^_: Insert Void    _g_: Roam Graph
+_a_: Find         _I_: Insert         _b_: Roam Buffer
+_f_: Find Map     _^_: Insert Void    _g_: Roam Graph
 _d_: Journal Map  _i_: Insert Map     _m_: Roam Meta-Data
 ------------------------------------------------------------------
 _k_: Org Capture  _c_: Roam Capture   _j_: Journal Capture
 "
   ("j" org-roam-dailies-capture-today)
   ("b" org-roam-buffer-toggle)
-  ("f" org-roam-node-find)
+  ("a" org-roam-node-find)
   ("g" org-roam-graph)
   ("I" org-roam-node-insert)
   ("c" org-roam-capture)
@@ -858,7 +858,7 @@ _k_: Org Capture  _c_: Roam Capture   _j_: Journal Capture
   ("m" (progn
          (Tn/org-roam-meta-data-hydra/body)
          (hydra-push '(Tn/org-roam-menu-hydra/body))))
-  ("r" (progn
+  ("f" (progn
          (Tn/org-roam-search-hydra/body)
          (hydra-push '(Tn/org-roam-menu-hydra/body))))
   ("i" (progn
@@ -878,7 +878,7 @@ _k_: Org Capture  _c_: Roam Capture   _j_: Journal Capture
 ^Tags^            ^Alias^          ^Refernce-Keys^
 ^^^^^^^^-----------------------------------------------------------
 _t_: add          _a_: Add         _r_: Add
-_T_: Remove       _A_: Remvoe      _R_: Remove
+_T_: Remove       _A_: Remove      _R_: Remove
 "
   ("t" org-roam-tag-add)
   ("T" org-roam-tag-remove)
@@ -1078,11 +1078,13 @@ _p_: Yesterday    _d_: Date          _y_: Yesterday
    :type git :repo "https://git.sr.ht/~l3kn/org-fc"
    :files (:defaults "awk" "demo.org"))
   :custom
-  (org-fc-directories '("~/Archive/Nodes/"
-                        "~/Archive/Files/"
+  (org-fc-directories '("~/Neuromancer/Grimoire/Nodes/"
+                        "~/Neuromancer/Grimoire/Files/"
                         "~/Projects"))
   :config
   (require 'org-fc-hydra))
+
+(global-set-key (kbd "C-c f") 'org-fc-hydra/body)
 
 (evil-define-minor-mode-key '(normal insert emacs) 'org-fc-review-flip-mode
   (kbd "RET") 'org-fc-review-flip
