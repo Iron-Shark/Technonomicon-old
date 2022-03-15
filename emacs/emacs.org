@@ -1,7 +1,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.config/emacs/init.el
 #+Author: Que Fanning
 #+Title: Emacs Literate Configuration
-#+LAST_MODIFIED: [2022-03-15 Tue 15:08]
+#+LAST_MODIFIED: [2022-03-15 Tue 16:13]
 
 * Package Management
 ** Warning Message
@@ -774,7 +774,7 @@ it can be passed in POS."
        (org-roam-capture-templates
        '(("l" "Literature Note Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/litterature-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("r" "Reference Summary" plain
@@ -784,32 +784,32 @@ it can be passed in POS."
 
          ("s" "Zettle Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/zettle-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("i" "Index Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/index-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("v" "Void Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/void-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("n" "Noun Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/noun-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("f" "File Default" plain
           (file "~/Neuromancer/Grimoire/Files/Templates/file-default.org")
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)
 
          ("d" "Default" plain
           "%?"
-          :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+          :if-new (file+head "General/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
           :unnarrowed t)))
 
   :config
