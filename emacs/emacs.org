@@ -1,7 +1,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ~/.config/emacs/init.el
 #+Author: Que Fanning
 #+Title: Emacs Literate Configuration
-#+LAST_MODIFIED: [2022-03-15 Tue 16:24]
+#+LAST_MODIFIED: [2022-03-20 Sun 14:01]
 
 * Package Management
 ** Warning Message
@@ -221,6 +221,7 @@ Adds ligature support to text buffers.
 #+begin_src emacs-lisp
 ;;; Local File Versioning
 (setq backup-directory-alist '(("." . "~/Neuromancer/Archive/Files/Emacs-Bak"))
+      undo-tree-history-directory-alist '(("." . "~/Neuromancer/Archive/Files/Undo-Tree"))
       backup-by-copying t
       version-control t
       vc-make-backup-files t
@@ -232,8 +233,8 @@ Adds ligature support to text buffers.
       savehist-save-minibuffer-history 1
       savehist-additional-variables
         '(kill-ring
-             search-ring
-             regexp-search-ring))
+          search-ring
+          regexp-search-ring))
 
 
 (setq tramp-backup-directory-alist backup-directory-alist
@@ -674,6 +675,9 @@ it can be passed in POS."
   :mode "\\.nix\\'")
 #+end_src
 
+*** LLVM
+https://github.com/llvm-mirror/llvm
+
 * Knowledge Management
 
 ** Bibtex Management
@@ -681,8 +685,8 @@ it can be passed in POS."
 *** Org Bibtex
 #+begin_src emacs-lisp
 (setq bibtex-user-optional-fields '(("keywords" "Search keywords" "")
-                                    ("file" "Link to source file" ":")
-                                    ("Summary" "Summary of source" ""))
+                                    ("file" "Link to source file" "")
+                                    ("Summary" "Summary of source" ":"))
       bibtex-align-at-equal-sign t
       bibtex-dialect 'biblatex
       bibtex-maintain-sorted-entries t
@@ -1178,6 +1182,57 @@ Exports to Haunt static site generator
 (use-package ox-haunt)
 (with-eval-after-load 'ox
   (require 'ox-haunt))
+#+end_src
+
+* Project Management
+
+** Magit
+
+#+begin_src emacs-lisp
+(use-package magit)
+
+(global-set-key (kbd "C-x M-g") 'magit-dispatch)
+#+end_src
+
+** Evil-Magit
+
+#+begin_src emacs-lisp
+(use-package evil-magit)
+#+end_src
+
+** Git-Gutter
+
+#+begin_src emacs-lisp
+(use-package git-gutter)
+
+(global-git-gutter-mode 1)
+(git-gutter:linum-setup)
+
+(custom-set-variables
+ '(git-gutter:modified-sign "~~")) ;; two space
+
+(set-face-foreground 'git-gutter:modified "deep sky blue") ;; background color
+(set-face-foreground 'git-gutter:added "green")
+(set-face-foreground 'git-gutter:deleted "red")
+#+end_src
+
+*** Keybindings
+
+#+begin_src emacs-lisp
+
+(defhydra Tn/org-git-gutter-menu-hydra (:color teal :hint nil)
+  "
+ ^Search^          ^Insert^            ^Utilities^
+------------------------------------------------------------------
+_a_: Find         _I_: Insert         _b_: Roam Buffer
+_f_: Find Map     _^_: Insert Void    _g_: Roam Graph
+_d_: Journal Map  _i_: Insert Map     _m_: Roam Meta-Data
+------------------------------------------------------------------
+_k_: Org Capture  _c_: Roam Capture   _j_: Journal Capture
+"
+  ("j" org-roam-dailies-capture-today)
+  ("b" org-roam-buffer-toggle)
+  ("a" org-roam-node-find)
 #+end_src
 
 * Infrastructure
